@@ -2,17 +2,19 @@ library(rdrobust)
 require(ggplot2)
 require(RCurl)
 require(devtools)
-source_url("https://raw.githubusercontent.com/AndrewBertoli/World-Cup-Code/master/WorldCupFunctions.R")
+source_url("https://raw.githubusercontent.com/AndrewBertoli/Natural-Experiments/master/RDPlot.R")
 
 
 
-setwd("/Users/andrewbertoli/Dropbox/United Government/BuildData")
+setwd("/Users/andrewbertoli/Dropbox/Electoral-RDs/2Empirics/Data")
 
 data=read.csv("Election_Data_Updated.csv")
 
+setwd("/Users/andrewbertoli/Dropbox/Electoral-RDs/1Drafts/WarParty")
+
 data$IdeologyDifference=data$LeaderIdeologyScore-data$RunnerUpIdeologyScore
 
-dems=data[data$Democracy==1&is.na(data$Z)==FALSE&is.na(data$IdeologyDifference)==FALSE,]
+dems=data[data$Democracy==1&is.na(data$Z)==FALSE&is.na(data$IdeologyDifference)==FALSE&is.na(data$Aggression)==FALSE,]
 dems=dems[-which(abs(dems$IdeologyDifference)<2),]
 
 dems$Z=dems$Z*(2*as.numeric(dems$IdeologyDifference>0)-1)
@@ -80,6 +82,24 @@ ggsave("AggressionPlotIdeo.pdf",width=4,height=2,scale = 2.6)
 
 
 
+rdrobust(dems$Aggression,dems$Z)
+
+bandwidth=rdbwselect(dems$Aggression,dems$Z)[[3]][[1]]
+
+pdf("IdeologyRDGraph.pdf")
+RDPlot(dems$Z,dems$Aggression,Bandwidth=bandwidth,xlab="Percent Right-Wing Candidate Was from Winning",ylab="Militarized Disputes Initiated",Main="",Tick.Marks = seq(-.2,.2,by=0.05),Labels=c("-20%","-15%","-10%","-5%","0%","5%","10%","15%","20%"),ylim=c(-0.05,0.6))
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Ideology
@@ -102,6 +122,33 @@ dems$AbsoluteChange=with(dems,abs(Aggression-PreviousAggression))
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+rdrobust(dems$AbsoluteChange,dems$Z)
+
+bandwidth=rdbwselect(dems$AbsoluteChange,dems$Z)[[3]][[1]]
+
+pdf("IncumbentRDGraph.pdf")
+RDPlot(dems$Z,dems$AbsoluteChange,Bandwidth=bandwidth,xlab="Percent Challenger Candidate Was from Winning",ylab="Absolute Change in Aggression",Main="",Tick.Marks = seq(-.2,.2,by=0.05),Labels=c("-20%","-15%","-10%","-5%","0%","5%","10%","15%","20%"),ylim=c(-0.05,0.6))
+dev.off()
 
 
 
