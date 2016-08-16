@@ -43,7 +43,7 @@ m = m + geom_histogram(fill="cornflowerblue",
                    origin = -50.00001)+
   theme_bw()+theme(axis.title = element_text(size=13),plot.title=element_text(size=20))+
   geom_vline(xintercept=0, colour="red")+
-  xlab("Percent of Votes That Right-Wing\nCandidate Was from Winning")+
+  xlab("Win/Loss Margin for\nRight-Wing Candidate")+
   ylab("Density") + labs(title="Ideology")+
   scale_x_continuous(breaks=seq(-20, 20, 5),labels=c("-20%","-15%","-10%","-5%","0%","5%","10%","15%","20%"))+
   ylim(0,20)
@@ -113,26 +113,41 @@ balanceplot1
 
 # External Validity
 
-colnames(nmc2)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  "Military Expenditures","Iron and Steel Production")
+setwd("/Users/andrewbertoli/Dropbox/United Government/BuildData")
+nmc=read.csv("NMC_v4_0(1).csv",stringsAsFactors=FALSE)
 
-# for(i in 1:ncol(nmc2)){nmc2[,i]=nmc2[,i]/mean(nmc2[,i],na.rm=TRUE)}
+setwd("/Users/andrewbertoli/Dropbox/United Government/ReplicationCode")
+polity=read.csv("Polity.csv",stringsAsFactors=FALSE)
 
-for(i in 1:ncol(nmc2)){nmc2[,i]=log(nmc2[,i]+1)}
+setwd("/Users/andrewbertoli/Dropbox/Electoral-RDs/1Drafts/WarParty")
+
+democracies=polity[polity$polity>=6,]
+
+democracies$index=paste(democracies$scode,democracies$year,sep=" ")
+nmc$index=paste(nmc$stateabb,nmc$year,sep=" ")
+
+alldems=(merge(democracies,nmc,by=c("index","index")))
+
+alldems=alldems[,c("upop","tpop","pec","milper","milex","irst")]
+
+for(i in 1:ncol(alldems)){alldems[,i]=log(alldems[,i]+1)}
 
 sample2=close[,c("upop", "tpop", "pec", "milper",  "milex","irst")]
 
 for(i in 1:ncol(sample2)){sample2[,i]=log(sample2[,i]+1)}
 
 
-fill=matrix(NA,nrow=nrow(nmc2)-nrow(sample2),ncol=ncol(sample2))
+fill=matrix(NA,nrow=nrow(alldems)-nrow(sample2),ncol=ncol(sample2))
 
 colnames(fill)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  "Military Expenditures","Iron and Steel Production")
 
+colnames(sample2)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  "Military Expenditures","Iron and Steel Production")
+
 sample2=rbind(sample2,fill)
 
-caps=cbind(sample2[,1],nmc2[,1],sample2[,2],nmc2[,2],sample2[,3],nmc2[,3],sample2[,4],nmc2[,4],sample2[,5],nmc2[,5],sample2[,6],nmc2[,6])
+caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],sample2[,4],alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
 
-caps=cbind(sample2[,1],nmc2[,1],sample2[,2],nmc2[,2],sample2[,3],nmc2[,3],sample2[,4],nmc2[,4],sample2[,5],nmc2[,5],sample2[,6],nmc2[,6])
+caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],sample2[,4],alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
 
 colnames(caps)=c("Sample Urban Population","Population Urban Population", "Sample Total Population", "Population Total Population","Sample Energy Consumption", "Population Energy Consumption","Sample Military Personel","Population Military Personel","Sample Military Expenditures",  "Population Military Expenditures","Sample Iron and Steel Production","Population Iron and Steel Production")
 
@@ -167,7 +182,7 @@ t.test(HighDisputesInitiated~T,close)
 
 #close=dems[abs(dems$Z)<=0.04,]
 
-outcomes=c("DisputesInitiated","HighDisputesInitiated","AllDisputes","AllHighDisputes","RevisionistDisputes","HighRevisionistDisputes")
+outcomes=c("DisputesInitiated","HighDisputesInitiated","AllDisputes","AllHighDisputes")# ,"RevisionistDisputes","HighRevisionistDisputes"
 
 t_test_results=matrix(0,nrow=length(outcomes),ncol=3)
 
@@ -187,7 +202,8 @@ rownames(standardized_results)=outcomes
 t_test_results=standardized_results
 
 cd <- as.data.frame(matrix(NA,length(outcomes),6))
-conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes","Revisionist Disputes","High-Level Revisionist Disputes")
+conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes") # ,"Revisionist Disputes","High-Level Revisionist Disputes"
+#conditions <- c("Disputes Initiated\n(per year)      ","High-Level Disputes\nInitiated (per year)","All Disputes\n(per year)  ","All High-Level Disputes\n(per year)          ") # ,"Revisionist Disputes","High-Level Revisionist Disputes"
 names(cd) <- c("mean","upper","lower","ord","measure")
 cd$mean <- t_test_results[,3]
 cd$lower <- t_test_results[,4]
@@ -205,9 +221,9 @@ plot3 <- f+geom_vline(xintercept=0, linetype="longdash")+
                      xmin = lower),
                  size=1.5, height=0)+
   geom_point(stat="identity",size=4,fill="white")+
-  xlab("Estimated Treatment Effect (Standardized)")+ylab("")+ labs(title="") +  theme_nolegend() +theme(axis.text=element_text(size=8.2),axis.title=element_text(size=12.5),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+scale_x_continuous(breaks=c(-0.5,0,0.2,0.5,0.8,1),labels=c("-0.5","0","small (0.2)","medium (0.5)","large (0.8)","1")) # Aggression During Term
+  xlab("Estimated Treatment Effect (Standardized)")+ylab("") +  theme_nolegend() + theme(axis.text.x=element_text(size=6.7),axis.text.x=element_text(size=8.7),axis.title=element_text(size=10),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.25,1.25),breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\n(very large)","-1","-0.8\n(large)","-0.5\n(medium)","-0.2\n(small)","0","0.2\n(small)","0.5\n(medium)","0.8\n(large)","1","1.2\n(very large)"))  # Aggression During Term
 
-ggsave("AggressionPlotIdeo.pdf",width=4,height=2,scale = 1.6)
+ggsave("AggressionPlotIdeo.pdf",width=3,height=1.3,scale = 1.6)
 
 
 
@@ -303,6 +319,44 @@ ggsave("PlaceboPlotsWarParty.pdf",width=3.2,height=1.2,scale = 3)
 
 # ExternalValidity
 
+close=dems[abs(dems$Z)<=0.04,]
+
+sample2=close[,c("upop", "tpop", "pec", "milper",  "milex","irst")]
+
+for(i in 1:ncol(sample2)){sample2[,i]=log(sample2[,i]+1)}
+
+
+fill=matrix(NA,nrow=nrow(alldems)-nrow(sample2),ncol=ncol(sample2))
+
+colnames(fill)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  "Military Expenditures","Iron and Steel Production")
+
+colnames(sample2)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  "Military Expenditures","Iron and Steel Production")
+
+sample2=rbind(sample2,fill)
+
+caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],sample2[,4],alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
+
+caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],sample2[,4],alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
+
+colnames(caps)=c("Sample Urban Population","Population Urban Population", "Sample Total Population", "Population Total Population","Sample Energy Consumption", "Population Energy Consumption","Sample Military Personel","Population Military Personel","Sample Military Expenditures",  "Population Military Expenditures","Sample Iron and Steel Production","Population Iron and Steel Production")
+
+caps=melt(caps)
+
+colnames(caps)[2:3]=c("Variable","Value")
+
+caps$Variable=factor(caps$Variable,levels=c("Sample Urban Population","Population Urban Population", "Sample Total Population", "Population Total Population","Sample Energy Consumption", "Population Energy Consumption","Sample Military Personel","Population Military Personel","Sample Military Expenditures",  "Population Military Expenditures","Sample Iron and Steel Production","Population Iron and Steel Production"),ordered=TRUE)
+
+ExternalValidity2 = ggplot(caps, aes(Variable,Value)) + geom_boxplot(fill=rep(c("cornflowerblue","lightgrey"),6)) + coord_flip() + ylab("ln(value)") + xlab("") + theme_bw() +theme(axis.title=element_text(size=16)) + ggtitle("Incumbency") +theme(plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))
+
+ExternalValidity2
+
+
+plot_grid(ExternalValidity1,ExternalValidity2,ncol=2)
+
+setwd("/Users/andrewbertoli/Dropbox/Electoral-RDs/1Drafts/WarParty")
+
+ggsave("External_Validity.pdf",width=3.1,height=1.1,scale = 3)
+
 
 
 
@@ -322,7 +376,7 @@ m2=m2 + geom_histogram(fill="cornflowerblue",
                    origin = -50.00001)+
   theme_bw()+theme(axis.title = element_text(size=13),plot.title=element_text(size=20))+
   geom_vline(xintercept=0, colour="red")+
-  xlab("Percent of Votes That Candidate from\nIncumbent Party Was from Winning")+
+  xlab("Win/Loss Margin for\nIncumbent Party Candidate")+
   ylab("Density") + labs(title="Incumbency")+
   scale_x_continuous(breaks=seq(-20, 20, 5),labels=c("-20%","-15%","-10%","-5%","0%","5%","10%","15%","20%"))+  ylim(0,20)
 m2  
@@ -354,7 +408,7 @@ t.test(AbsoluteChangeHighDisputesInitiated~T,close,alternative="less")
 
 
 
-outcomes=c("AbsoluteChangeDisputesInitiated","AbsoluteChangeHighDisputesInitiated","AbsoluteChangeAllDisputes","AbsoluteChangeAllHighDisputes","AbsoluteChangeRevisionistDisputes","AbsoluteChangeHighRevisionistDisputes")
+outcomes=c("AbsoluteChangeDisputesInitiated","AbsoluteChangeHighDisputesInitiated","AbsoluteChangeAllDisputes","AbsoluteChangeAllHighDisputes") #,"AbsoluteChangeRevisionistDisputes","AbsoluteChangeHighRevisionistDisputes"
 
 t_test_results=matrix(0,nrow=length(outcomes),ncol=3)
 
@@ -389,7 +443,7 @@ theme_nolegend <- function (base_size = 9, base_family = "", height, width)
 }
 
 cd <- as.data.frame(matrix(NA,length(outcomes),6))
-conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes","Revisionist Disputes","High-Level Revisionist Disputes")
+conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes") # ,"Revisionist Disputes","High-Level Revisionist Disputes"
 names(cd) <- c("mean","upper","lower","ord","measure")
 cd$mean <- t_test_results[,3]
 cd$lower <- t_test_results[,4]
@@ -407,9 +461,9 @@ plot3 <- f+geom_vline(xintercept=0, linetype="longdash")+
                      xmin = lower),
                  size=1.5, height=0)+
   geom_point(stat="identity",size=4,fill="white")+
-  xlab("Estimated Treatment Effect (Standardized)")+ylab("")+ labs(title="") +  theme_nolegend() + theme(axis.text=element_text(size=8.7),axis.title=element_text(size=12.5),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ scale_x_continuous(breaks=c(-0.5,0,0.2,0.5,0.8,1),labels=c("-0.5","0","small (0.2)","medium (0.5)","large (0.8)","1")) # Aggression During Term
+  xlab("Estimated Treatment Effect (Standardized)")+ylab("") +  theme_nolegend() + theme(axis.text.x=element_text(size=6.7),axis.text.x=element_text(size=8.7),axis.title=element_text(size=10),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.25,1.25),breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\n(very large)","-1","-0.8\n(large)","-0.5\n(medium)","-0.2\n(small)","0","0.2\n(small)","0.5\n(medium)","0.8\n(large)","1","1.2\n(very large)"))  # Aggression During Term
 
-ggsave("AggressionPlotInc.pdf",width=4,height=2,scale = 1.6)
+ggsave("AggressionPlotInc.pdf",width=3,height=1.3,scale = 1.6)
 
 
 summary(lm(AbsoluteChangeHighDisputesInitiated~T,close))
