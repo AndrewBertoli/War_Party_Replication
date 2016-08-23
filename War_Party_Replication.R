@@ -163,7 +163,7 @@ ExternalValidity1
 
 
 
-
+close=dems[abs(dems$Z)<=0.04,]
 
 close[close$Z>0,c("Country","Year","DisputesInitiated","HighDisputesInitiated")][order(close[close$Z>0,]$Year),]
 
@@ -180,7 +180,7 @@ t.test(HighDisputesInitiated~T,close)
 #dems$AllHighDisputes=dems$AllHighDisputes*scale_number
 #dems$RevisionistDisputes=dems$RevisionistDisputes*scale_number
 
-#close=dems[abs(dems$Z)<=0.04,]
+
 
 outcomes=c("DisputesInitiated","HighDisputesInitiated","AllDisputes","AllHighDisputes")# ,"RevisionistDisputes","HighRevisionistDisputes"
 
@@ -221,9 +221,9 @@ plot3 <- f+geom_vline(xintercept=0, linetype="longdash")+
                      xmin = lower),
                  size=1.5, height=0)+
   geom_point(stat="identity",size=4,fill="white")+
-  xlab("Estimated Treatment Effect (Standardized)")+ylab("") +  theme_nolegend() + theme(axis.text.x=element_text(size=6.7),axis.text.x=element_text(size=8.7),axis.title=element_text(size=10),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.25,1.25),breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\n(very large)","-1","-0.8\n(large)","-0.5\n(medium)","-0.2\n(small)","0","0.2\n(small)","0.5\n(medium)","0.8\n(large)","1","1.2\n(very large)"))  # Aggression During Term
+  xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + theme(legend.position="none",axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),axis.title=element_text(size=12.5),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.25,1.25),breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium","-0.2\nsmall","0","0.2\nsmall","0.5\nmedium","0.8\nlarge","1","1.2\nvery large"))  # Aggression During Term
 
-ggsave("AggressionPlotIdeo.pdf",width=3,height=1.3,scale = 1.6)
+ggsave("AggressionPlotIdeo.pdf",width=4,height=2,scale = 1.6)
 
 
 
@@ -461,9 +461,9 @@ plot3 <- f+geom_vline(xintercept=0, linetype="longdash")+
                      xmin = lower),
                  size=1.5, height=0)+
   geom_point(stat="identity",size=4,fill="white")+
-  xlab("Estimated Treatment Effect (Standardized)")+ylab("") +  theme_nolegend() + theme(axis.text.x=element_text(size=6.7),axis.text.x=element_text(size=8.7),axis.title=element_text(size=10),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.25,1.25),breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\n(very large)","-1","-0.8\n(large)","-0.5\n(medium)","-0.2\n(small)","0","0.2\n(small)","0.5\n(medium)","0.8\n(large)","1","1.2\n(very large)"))  # Aggression During Term
+  xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + theme(legend.position="none",axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),axis.title=element_text(size=12.5),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.25,1.25),breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium","-0.2\nsmall","0","0.2\nsmall","0.5\nmedium","0.8\nlarge","1","1.2\nvery large")) 
 
-ggsave("AggressionPlotInc.pdf",width=3,height=1.3,scale = 1.6)
+ggsave("AggressionPlotInc.pdf",width=4,height=2,scale = 1.6)
 
 
 summary(lm(AbsoluteChangeHighDisputesInitiated~T,close))
