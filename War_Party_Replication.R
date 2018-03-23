@@ -449,25 +449,41 @@ for(i in 1:ncol(sample2)){sample2[,i]=log(sample2[,i]+1)}
 
 fill=matrix(NA,nrow=nrow(alldems)-nrow(sample2),ncol=ncol(sample2))
 
-colnames(fill)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  "Military Expenditures","Iron and Steel Production")
+colnames(fill)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  
+                 "Military Expenditures","Iron and Steel Production")
 
-colnames(sample2)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  "Military Expenditures","Iron and Steel Production")
+colnames(sample2)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  
+                    "Military Expenditures","Iron and Steel Production")
 
 sample2=rbind(sample2,fill)
 
-caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],sample2[,4],alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
+caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],
+           sample2[,4],alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
 
-caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],sample2[,4],alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
+caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],
+           sample2[,4],alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
 
-colnames(caps)=c("Sample Urban Population","Population Urban Population", "Sample Total Population", "Population Total Population","Sample Energy Consumption", "Population Energy Consumption","Sample Military Personel","Population Military Personel","Sample Military Expenditures",  "Population Military Expenditures","Sample Iron and Steel Production","Population Iron and Steel Production")
+colnames(caps)=c("Sample Urban Population","Population Urban Population", "Sample Total Population", 
+                 "Population Total Population","Sample Energy Consumption", "Population Energy Consumption",
+                 "Sample Military Personel","Population Military Personel","Sample Military Expenditures",  
+                 "Population Military Expenditures","Sample Iron and Steel Production",
+                 "Population Iron and Steel Production")
 
 caps=melt(caps)
 
 colnames(caps)[2:3]=c("Variable","Value")
 
-caps$Variable=factor(caps$Variable,levels=c("Sample Urban Population","Population Urban Population", "Sample Total Population", "Population Total Population","Sample Energy Consumption", "Population Energy Consumption","Sample Military Personel","Population Military Personel","Sample Military Expenditures",  "Population Military Expenditures","Sample Iron and Steel Production","Population Iron and Steel Production"),ordered=TRUE)
+caps$Variable=factor(caps$Variable,levels=c("Sample Urban Population","Population Urban Population", 
+                                            "Sample Total Population", "Population Total Population",
+                                            "Sample Energy Consumption", "Population Energy Consumption",
+                                            "Sample Military Personel","Population Military Personel",
+                                            "Sample Military Expenditures",  "Population Military Expenditures",
+                                            "Sample Iron and Steel Production","Population Iron and Steel Production"),
+                     ordered=TRUE)
 
-ExternalValidity2 = ggplot(caps, aes(Variable,Value)) + geom_boxplot(fill=rep(c("cornflowerblue","lightgrey"),6)) + coord_flip() + ylab("ln(value)") + xlab("") + theme_bw() +theme(axis.title=element_text(size=16)) + ggtitle("Incumbency") +theme(plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))
+ExternalValidity2 = ggplot(caps, aes(Variable,Value)) + geom_boxplot(fill=rep(c("cornflowerblue","lightgrey"),6)) + 
+coord_flip() + ylab("ln(value)") + xlab("") + theme_bw() +theme(axis.title=element_text(size=16)) 
++ ggtitle("Incumbency") +theme(plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))
 
 ExternalValidity2
 
@@ -521,7 +537,8 @@ t.test(AbsoluteChangeDisputesInitiated~T,close,alternative="less")
 t.test(AbsoluteChangeHighDisputesInitiated~T,close,alternative="less")
 
 
-outcomes=c("AbsoluteChangeDisputesInitiated","AbsoluteChangeHighDisputesInitiated","AbsoluteChangeAllDisputes","AbsoluteChangeAllHighDisputes") 
+outcomes=c("AbsoluteChangeDisputesInitiated","AbsoluteChangeHighDisputesInitiated","AbsoluteChangeAllDisputes",
+           "AbsoluteChangeAllHighDisputes") 
 
 t_test_results=matrix(0,nrow=length(outcomes),ncol=3)
 
@@ -533,7 +550,9 @@ t_test_results[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[2],-
 
 for(i in 1:length(outcomes)){
 output=t.test(close[,outcomes[i]]~close$T,conf.level=0.90)
-standardized_results[i,]=c((output$estimate[2]-output$estimate[1]),sd(close[,outcomes[i]]),(output$estimate[2]-output$estimate[1])/sd(close[,outcomes[i]]),-output$conf.int[1]/sd(close[,outcomes[i]]),-output$conf.int[2]/sd(close[,outcomes[i]]))}
+standardized_results[i,]=c((output$estimate[2]-output$estimate[1]),sd(close[,outcomes[i]]),(output$estimate[2]-
+output$estimate[1])/sd(close[,outcomes[i]]),-output$conf.int[1]/sd(close[,outcomes[i]]),-output$conf.int[2]/
+sd(close[,outcomes[i]]))}
 
 colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standardized Upper Bound", "Standardized Lower Bound")
 rownames(standardized_results)=outcomes
@@ -556,7 +575,7 @@ theme_nolegend <- function (base_size = 9, base_family = "", height, width)
 }
 
 cd <- as.data.frame(matrix(NA,length(outcomes),6))
-conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes") # ,"Revisionist Disputes","High-Level Revisionist Disputes"
+conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes") 
 names(cd) <- c("mean","upper","lower","ord","measure")
 cd$mean <- t_test_results[,3]
 cd$lower <- t_test_results[,4]
