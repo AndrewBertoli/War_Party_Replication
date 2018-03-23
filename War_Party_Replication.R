@@ -17,7 +17,9 @@ setwd("/Users/andrewbertoli/Dropbox/Electoral-RDs/1Drafts/WarParty")
 
 data$IdeologyDifference=data$LeaderIdeologyScore-data$RunnerUpIdeologyScore
 
-dems_base=data[data$Democracy==1&is.na(data$Z)==FALSE&is.na(data$IdeologyDifference)==FALSE&is.na(data$DisputesInitiated)==FALSE,]
+dems_base=data[data$Democracy==1&is.na(data$Z)==FALSE&is.na(data$IdeologyDifference)==FALSE&
+is.na(data$DisputesInitiated)==FALSE,]
+
 dems=dems_base[-which(abs(dems_base$IdeologyDifference)<2),]
 
 dems$Z=dems$Z*(2*as.numeric(dems$IdeologyDifference>0)-1)
@@ -53,13 +55,16 @@ close=dems[abs(dems$Z)<=0.04,]
 
 # BalancePlot
 
-covs=c("PreviousDisputesInitiated","PreviousHighDisputesInitiated","AllPreviousDisputes","AllPreviousHighDisputes","PreviousRevisionistDisputes","PreviousHighRevisionistDisputes", "irst", "milex", "milper", "pec", "tpop", "upop")
+covs=c("PreviousDisputesInitiated","PreviousHighDisputesInitiated","AllPreviousDisputes",
+"AllPreviousHighDisputes","PreviousRevisionistDisputes","PreviousHighRevisionistDisputes", 
+"irst", "milex", "milper", "pec", "tpop", "upop")
 
 est=matrix(NA,ncol=3,nrow=length(covs))
 
 for(i in 1:length(covs)){
 output=t.test(dems[abs(dems$Z)<=0.04,covs[i]]~as.numeric(dems[abs(dems$Z)<=0.04,]$Z>0))
-est[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[1],-output$conf.int[2])/sd(dems[,covs[i]],na.rm=TRUE)}
+est[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[1],-output$conf.int[2])/
+  sd(dems[,covs[i]],na.rm=TRUE)}
 
 
 theme_nolegend <- function (base_size = 9, base_family = "", height, width) 
@@ -78,7 +83,10 @@ theme_nolegend <- function (base_size = 9, base_family = "", height, width)
 }
 
 cd <- as.data.frame(matrix(NA,length(covs),5))
-conditions <- c("Previous Disputes Initiated","Previous High-Level Disputes Initiated","All Previous Disputes","All Previous High-Level Disputes","Previous Revisionist Disputes", "Previous High-Level Revisionist Disputes", "Iron and Steel Production",  "Military Expenditures", "Military Personel",     "Energy Consumption",  "Total Population", "Urban Population")
+conditions <- c("Previous Disputes Initiated","Previous High-Level Disputes Initiated",
+"All Previous Disputes","All Previous High-Level Disputes","Previous Revisionist Disputes", 
+"Previous High-Level Revisionist Disputes", "Iron and Steel Production", "Military Expenditures", 
+"Military Personel",     "Energy Consumption",  "Total Population", "Urban Population")
 names(cd) <- c("mean","upper","lower","ord","measure")
 cd$mean <- as.numeric(est[,1])
 cd$lower <- as.numeric(est[,3])
@@ -92,11 +100,11 @@ f <- ggplot(cd,
             aes(x=mean,y=measure,color="dodgerblue2"))
 balanceplot1 <- f+geom_vline(xintercept=0, linetype="longdash")+
 
-  geom_errorbarh(aes(xmax =  upper, 
-                     xmin = lower),
-                 size=1.5, height=0,color="dodgerblue2")+
-  geom_point(stat="identity",size=4,fill="white",color="dodgerblue2")+
-  xlab("Difference (Standardized)")+ylab("")+ labs(title="Ideology") +theme(legend.position="none",axis.text=element_text(size=10),axis.title=element_text(size=12),axis.title.x = element_text(hjust=1),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+xlim(-2,2)
+geom_errorbarh(aes(xmax =  upper, xmin = lower), size=1.5, height=0,color="dodgerblue2")+
+geom_point(stat="identity",size=4,fill="white",color="dodgerblue2")+ xlab("Difference (Standardized)")+
+ylab("")+ labs(title="Ideology") +theme(legend.position="none",axis.text=element_text(size=10),
+axis.title=element_text(size=12),axis.title.x = element_text(hjust=1),
+plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+xlim(-2,2)
 
 balanceplot1
 
@@ -131,25 +139,41 @@ for(i in 1:ncol(sample2)){sample2[,i]=log(sample2[,i]+1)}
 
 fill=matrix(NA,nrow=nrow(alldems)-nrow(sample2),ncol=ncol(sample2))
 
-colnames(fill)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  "Military Expenditures","Iron and Steel Production")
+colnames(fill)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  
+                 "Military Expenditures","Iron and Steel Production")
 
-colnames(sample2)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  "Military Expenditures","Iron and Steel Production")
+colnames(sample2)=c("Urban Population", "Total Population", "Energy Consumption", "Military Personel",  
+                    "Military Expenditures","Iron and Steel Production")
 
 sample2=rbind(sample2,fill)
 
-caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],sample2[,4],alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
+caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],sample2[,4],
+           alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
 
-caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],sample2[,4],alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
+caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],sample2[,4],
+           alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
 
-colnames(caps)=c("Sample Urban Population","Population Urban Population", "Sample Total Population", "Population Total Population","Sample Energy Consumption", "Population Energy Consumption","Sample Military Personel","Population Military Personel","Sample Military Expenditures",  "Population Military Expenditures","Sample Iron and Steel Production","Population Iron and Steel Production")
+colnames(caps)=c("Sample Urban Population","Population Urban Population", "Sample Total Population", 
+                 "Population Total Population","Sample Energy Consumption", "Population Energy Consumption",
+                 "Sample Military Personel","Population Military Personel","Sample Military Expenditures",  
+                 "Population Military Expenditures","Sample Iron and Steel Production",
+                 "Population Iron and Steel Production")
 
 caps=melt(caps)
 
 colnames(caps)[2:3]=c("Variable","Value")
 
-caps$Variable=factor(caps$Variable,levels=c("Sample Urban Population","Population Urban Population", "Sample Total Population", "Population Total Population","Sample Energy Consumption", "Population Energy Consumption","Sample Military Personel","Population Military Personel","Sample Military Expenditures",  "Population Military Expenditures","Sample Iron and Steel Production","Population Iron and Steel Production"),ordered=TRUE)
+caps$Variable=factor(caps$Variable,levels=c("Sample Urban Population","Population Urban Population", 
+                                            "Sample Total Population", "Population Total Population",
+                                            "Sample Energy Consumption", "Population Energy Consumption",
+                                            "Sample Military Personel","Population Military Personel",
+                                            "Sample Military Expenditures", "Population Military Expenditures",
+                                            "Sample Iron and Steel Production","Population Iron and Steel Production"),
+                     ordered=TRUE)
 
-ExternalValidity1 = ggplot(caps, aes(Variable,Value)) + geom_boxplot(fill=rep(c("cornflowerblue","lightgrey"),6)) + coord_flip() + ylab("ln(value)") + xlab("") + theme_bw() +theme(axis.title=element_text(size=16)) + ggtitle("Ideology") +theme(plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))
+ExternalValidity1 = ggplot(caps, aes(Variable,Value)) + geom_boxplot(fill=rep(c("cornflowerblue","lightgrey"),6)) +
+coord_flip()+ylab("ln(value)")+xlab("")+theme_bw()+theme(axis.title=element_text(size=16))+ggtitle("Ideology") +
+theme(plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))
 
 ExternalValidity1
 
@@ -172,7 +196,7 @@ costa_rica_dropped$DisputesInitiated[costa_rica_dropped$Country=="Costa Rica"]=0
 t.test(DisputesInitiated~T,costa_rica_dropped)
 t.test(HighDisputesInitiated~T,costa_rica_dropped)
 
-outcomes=c("DisputesInitiated","HighDisputesInitiated","AllDisputes","AllHighDisputes")# ,"RevisionistDisputes","HighRevisionistDisputes"
+outcomes=c("DisputesInitiated","HighDisputesInitiated","AllDisputes","AllHighDisputes")
 
 t_test_results=matrix(0,nrow=length(outcomes),ncol=3)
 
@@ -184,16 +208,19 @@ t_test_results[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[1],-
 
 for(i in 1:length(outcomes)){
 output=t.test(close[,outcomes[i]]~close$T)
-standardized_results[i,]=c((output$estimate[2]-output$estimate[1]),sd(close[,outcomes[i]]),(output$estimate[2]-output$estimate[1])/sd(close[,outcomes[i]]),-output$conf.int[1]/sd(close[,outcomes[i]]),-output$conf.int[2]/sd(close[,outcomes[i]]))}
+standardized_results[i,]=c((output$estimate[2]-output$estimate[1]),sd(close[,outcomes[i]]),
+                           (output$estimate[2]-output$estimate[1])/sd(close[,outcomes[i]]),
+                           -output$conf.int[1]/sd(close[,outcomes[i]]),-output$conf.int[2]/
+                           sd(close[,outcomes[i]]))}
 
-colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standardized Upper Bound", "Standardized Lower Bound")
+colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standardized Upper Bound", 
+                                 "Standardized Lower Bound")
 rownames(standardized_results)=outcomes
 
 t_test_results=standardized_results
 
 cd <- as.data.frame(matrix(NA,length(outcomes),6))
-conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes") # ,"Revisionist Disputes","High-Level Revisionist Disputes"
-#conditions <- c("Disputes Initiated\n(per year)      ","High-Level Disputes\nInitiated (per year)","All Disputes\n(per year)  ","All High-Level Disputes\n(per year)          ") # ,"Revisionist Disputes","High-Level Revisionist Disputes"
+conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes") 
 names(cd) <- c("mean","upper","lower","ord","measure")
 cd$mean <- t_test_results[,3]
 cd$lower <- t_test_results[,4]
@@ -211,9 +238,15 @@ plot3 <- f+geom_vline(xintercept=0, linetype="longdash")+
                      xmin = lower),
                  size=1.5, height=0)+
   geom_point(stat="identity",size=4,fill="white")+
-  xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + theme(legend.position="none",axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),axis.title=element_text(size=12.5),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.25,1.25),breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium","-0.2\nsmall","0","0.2\nsmall","0.5\nmedium","0.8\nlarge","1","1.2\nvery large")) +  geom_vline(xintercept=c(-1.2,-0.8,-0.5,-0.2,0.2,0.5,0.8,1.2),linetype=rep("dashed",8),colour=c("turquoise4","turquoise3","turquoise2","turquoise1","turquoise1","turquoise2","turquoise3","turquoise4"))+
-  scale_color_manual(name="",
-                     values=c("dodgerblue4","dodgerblue","darkblue","dodgerblue3")) # Aggression During Term
+  xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + 
+theme(legend.position="none",axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),
+axis.title=element_text(size=12.5),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ 
+scale_x_continuous(limits=c(-1.25,1.25),breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),
+labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium","-0.2\nsmall","0","0.2\nsmall","0.5\nmedium",
+"0.8\nlarge","1","1.2\nvery large")) +  geom_vline(xintercept=c(-1.2,-0.8,-0.5,-0.2,0.2,0.5,0.8,1.2),
+linetype=rep("dashed",8),colour=c("turquoise4","turquoise3","turquoise2","turquoise1","turquoise1",
+"turquoise2","turquoise3","turquoise4"))+scale_color_manual(name="",values=c("dodgerblue4","dodgerblue",
+"darkblue","dodgerblue3")) 
 
 ggsave("AggressionPlotIdeo.pdf",width=4,height=2,scale = 1.6)
 
@@ -233,7 +266,8 @@ ggsave("AggressionPlotIdeo.pdf",width=4,height=2,scale = 1.6)
 
 
 
-outcomes=c("DisputesInitiated","HighDisputesInitiated","AllDisputes","AllHighDisputes","RevisionistDisputes","HighRevisionistDisputes")# 
+outcomes=c("DisputesInitiated","HighDisputesInitiated","AllDisputes","AllHighDisputes",
+           "RevisionistDisputes","HighRevisionistDisputes")
 
 t_test_results=matrix(0,nrow=length(outcomes),ncol=3)
 
@@ -245,9 +279,13 @@ t_test_results[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[2],-
 
 for(i in 1:length(outcomes)){
 output=t.test(close[,outcomes[i]]~close$T,conf.level=0.90)
-standardized_results[i,]=c((output$estimate[2]-output$estimate[1]),sd(close[,outcomes[i]]),(output$estimate[2]-output$estimate[1])/sd(close[,outcomes[i]]),-output$conf.int[1]/sd(close[,outcomes[i]]),-output$conf.int[2]/sd(close[,outcomes[i]]))}
+standardized_results[i,]=c((output$estimate[2]-output$estimate[1]),sd(close[,outcomes[i]]),
+                           (output$estimate[2]-output$estimate[1])/sd(close[,outcomes[i]]),
+                           -output$conf.int[1]/sd(close[,outcomes[i]]),-output$conf.int[2]/
+                           sd(close[,outcomes[i]]))}
 
-colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standardized Upper Bound", "Standardized Lower Bound")
+colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standardized Upper Bound", 
+                                 "Standardized Lower Bound")
 rownames(standardized_results)=outcomes
 
 t_test_results=standardized_results
@@ -255,14 +293,15 @@ t_test_results=standardized_results
 
 
 cd <- as.data.frame(matrix(NA,length(outcomes),6))
-conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes","Revisionist Disputes","High-Level Revisionist Disputes") # 
+conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes",
+                "Revisionist Disputes","High-Level Revisionist Disputes") 
 names(cd) <- c("mean","upper","lower","ord","measure")
 cd$mean <- t_test_results[,3]
 cd$lower <- t_test_results[,4]
 cd$upper <- t_test_results[,5]
 cd$ord <- c(length(outcomes):1)
 cd$measure <- factor(conditions, levels=conditions[order(cd$ord)])
-# make the graph
+
 library(ggplot2)
 
 
@@ -307,8 +346,9 @@ t.test(HighDisputesInitiated+as.numeric(close$T==1)*1.2*sd(close$HighDisputesIni
 t.test(HighDisputesInitiated+as.numeric(close$T==1)*0.8*sd(close$HighDisputesInitiated)~T,close)
 t.test(HighDisputesInitiated+as.numeric(close$T==1)*0.5*sd(close$HighDisputesInitiated)~T,close)
 
-# Adjusting the minimum ideology distance between parties
 
+
+# Adjusting the minimum ideology distance between parties
 
 diff1=dems_base[-which(abs(dems_base$IdeologyDifference)<1),]
 diff1$Z=diff1$Z*(2*as.numeric(diff1$IdeologyDifference>0)-1)
@@ -351,7 +391,8 @@ dems$T=as.numeric(dems$Z>0)
 
 # Balance Plot
 
-covs=c("PreviousDisputesInitiated","PreviousHighDisputesInitiated","AllPreviousDisputes","AllPreviousHighDisputes","PreviousRevisionistDisputes","PreviousHighRevisionistDisputes", "irst", "milex", "milper", "pec", "tpop", "upop")
+covs=c("PreviousDisputesInitiated","PreviousHighDisputesInitiated","AllPreviousDisputes","AllPreviousHighDisputes",
+       "PreviousRevisionistDisputes","PreviousHighRevisionistDisputes", "irst", "milex", "milper", "pec", "tpop", "upop")
 
 est=matrix(NA,ncol=3,nrow=length(covs))
 
