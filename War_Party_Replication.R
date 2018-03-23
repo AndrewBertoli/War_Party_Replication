@@ -529,9 +529,11 @@ ggsave("ForcingDensity.pdf",width=2.4,height=1.1,scale = 3)
 
 close=dems[abs(dems$Z)<=0.04,]
 
-close[close$Z>0,c("Country","Year","AbsoluteChangeDisputesInitiated","AbsoluteChangeHighDisputesInitiated")][order(close[close$Z>0,]$Year),]
+close[close$Z>0,c("Country","Year","AbsoluteChangeDisputesInitiated",
+                  "AbsoluteChangeHighDisputesInitiated")][order(close[close$Z>0,]$Year),]
 
-close[close$Z<0,c("Country","Year","AbsoluteChangeDisputesInitiated","AbsoluteChangeHighDisputesInitiated")][order(close[close$Z<0,]$Year),]
+close[close$Z<0,c("Country","Year","AbsoluteChangeDisputesInitiated",
+                  "AbsoluteChangeHighDisputesInitiated")][order(close[close$Z<0,]$Year),]
 
 t.test(AbsoluteChangeDisputesInitiated~T,close,alternative="less")
 t.test(AbsoluteChangeHighDisputesInitiated~T,close,alternative="less")
@@ -554,7 +556,8 @@ standardized_results[i,]=c((output$estimate[2]-output$estimate[1]),sd(close[,out
 output$estimate[1])/sd(close[,outcomes[i]]),-output$conf.int[1]/sd(close[,outcomes[i]]),-output$conf.int[2]/
 sd(close[,outcomes[i]]))}
 
-colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standardized Upper Bound", "Standardized Lower Bound")
+colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standardized Upper Bound", 
+                                 "Standardized Lower Bound")
 rownames(standardized_results)=outcomes
 
 t_test_results=standardized_results
