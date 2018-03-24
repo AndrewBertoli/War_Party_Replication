@@ -1,6 +1,8 @@
-library(reshape)
-library(rdrobust)
-library(cowplot)
+# Start by loading the following libraries
+
+require(reshape)
+require(rdrobust)
+require(cowplot)
 require(ggplot2)
 require(RCurl)
 require(devtools)
