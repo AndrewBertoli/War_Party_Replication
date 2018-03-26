@@ -234,7 +234,9 @@ costa_rica_dropped$DisputesInitiated[costa_rica_dropped$Country=="Costa Rica"]=0
 
 t.test(DisputesInitiated~T,costa_rica_dropped)
 t.test(HighDisputesInitiated~T,costa_rica_dropped)
+t.test(HighDisputesInitiated>0~T,costa_rica_dropped)
 
+# The final test here addresses the issue that the U.S. (2001) is an outlier.
 
 # We can now make the coefficent plot for ideology.
 
