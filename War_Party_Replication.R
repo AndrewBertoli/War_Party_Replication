@@ -519,26 +519,26 @@ incumbency$AbsoluteChangeHighRevisionistDisputes=with(incumbency,abs(HighRevisio
 
 close=incumbency[abs(incumbency$Z)<=0.04,]
 
+# We can now make the talbe for the incumbency cases
+
 close[close$Z>0,c("Country","Year","AbsoluteChangeDisputesInitiated",
                   "AbsoluteChangeHighDisputesInitiated")][order(close[close$Z>0,]$Year),]
 
 close[close$Z<0,c("Country","Year","AbsoluteChangeDisputesInitiated",
                   "AbsoluteChangeHighDisputesInitiated")][order(close[close$Z<0,]$Year),]
 
+# Next, we can look at the results from t-tests
+
 t.test(AbsoluteChangeDisputesInitiated~T,close,alternative="less")
 t.test(AbsoluteChangeHighDisputesInitiated~T,close,alternative="less")
 
 
+# We can now make the coefficent plot for ideology.
+
 outcomes=c("AbsoluteChangeDisputesInitiated","AbsoluteChangeHighDisputesInitiated","AbsoluteChangeAllDisputes",
            "AbsoluteChangeAllHighDisputes") 
 
-t_test_results=matrix(0,nrow=length(outcomes),ncol=3)
-
 standardized_results=matrix(0,nrow=length(outcomes),ncol=5)
-
-for(i in 1:length(outcomes)){
-output=t.test(close[,outcomes[i]]~close$T,conf.level=0.90)
-t_test_results[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[2],-output$conf.int[1])}
 
 for(i in 1:length(outcomes)){
 output=t.test(close[,outcomes[i]]~close$T,conf.level=0.90)
@@ -548,9 +548,8 @@ sd(close[,outcomes[i]]))}
 
 colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standardized Upper Bound", 
                                  "Standardized Lower Bound")
-rownames(standardized_results)=outcomes
 
-t_test_results=standardized_results
+rownames(standardized_results)=outcomes
 
 theme_nolegend <- function (base_size = 9, base_family = "", height, width) 
 {
@@ -570,27 +569,24 @@ theme_nolegend <- function (base_size = 9, base_family = "", height, width)
 cd <- as.data.frame(matrix(NA,length(outcomes),6))
 conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes") 
 names(cd) <- c("mean","upper","lower","ord","measure")
-cd$mean <- t_test_results[,3]
-cd$lower <- t_test_results[,4]
-cd$upper <- t_test_results[,5]
+cd$mean <- standardized_results[,3]
+cd$lower <- standardized_results[,4]
+cd$upper <- standardized_results[,5]
 cd$ord <- c(length(outcomes):1)
 cd$measure <- factor(conditions, levels=conditions[order(cd$ord)])
 
-f <- ggplot(cd, 
-            aes(x=mean,y=measure,color=measure))
-plot3 <- f+geom_vline(xintercept=0, linetype="longdash")+
-
-  geom_errorbarh(aes(xmax =  upper, 
-                     xmin = lower),
-                 size=1.5, height=0)+
-  geom_point(stat="identity",size=4,fill="white")+
-  xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + theme(legend.position="none",
-  axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),axis.title=element_text(size=12.5),
-  plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.25,1.25),
-  breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium",
-  "-0.2\nsmall","0","0.2\nsmall","0.5\nmedium","0.8\nlarge","1","1.2\nvery large")) +  
+AggressionPlot2 <- ggplot(cd, aes(x=mean,y=measure,color=measure))+geom_vline(xintercept=0, linetype="longdash")+
+geom_errorbarh(aes(xmax =  upper, xmin = lower), size=1.5, height=0)+
+geom_point(stat="identity",size=4,fill="white")+ xlab("Estimated Treatment Effect (Standardized)")+
+ylab("")  + theme(legend.position="none",axis.text.x=element_text(size=7.7),
+axis.text.y=element_text(size=10.7),axis.title=element_text(size=12.5), 
+plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ 
+scale_x_continuous(limits=c(-1.25,1.25), breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),
+labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium","-0.2\nsmall","0","0.2\nsmall",
+         "0.5\nmedium","0.8\nlarge","1","1.2\nvery large")) +  
   geom_vline(xintercept=c(-1.2,-0.8,-0.5,-0.2,0.2,0.5,0.8,1.2),linetype=rep("dashed",8),
-  colour=c("turquoise4","turquoise3","turquoise2","turquoise1","turquoise1","turquoise2","turquoise3","turquoise4"))+
+  colour=c("turquoise4","turquoise3","turquoise2","turquoise1","turquoise1","turquoise2",
+           "turquoise3","turquoise4"))+
   scale_color_manual(name="", values=c("dodgerblue4","dodgerblue","darkblue","dodgerblue3"))
 
 
@@ -607,18 +603,13 @@ ggsave("AggressionPlotInc.pdf",width=4,height=2,scale = 1.6)
 
 
 
-
+# We can now make the version of the graph with revisionist disputes included that is available in the
+# Online Appendix
 
 outcomes=c("AbsoluteChangeDisputesInitiated","AbsoluteChangeHighDisputesInitiated","AbsoluteChangeAllDisputes",
-           "AbsoluteChangeAllHighDisputes","AbsoluteChangeRevisionistDisputes","AbsoluteChangeHighRevisionistDisputes")
-
-t_test_results=matrix(0,nrow=length(outcomes),ncol=3)
+"AbsoluteChangeAllHighDisputes","AbsoluteChangeRevisionistDisputes","AbsoluteChangeHighRevisionistDisputes")
 
 standardized_results=matrix(0,nrow=length(outcomes),ncol=5)
-
-for(i in 1:length(outcomes)){
-output=t.test(close[,outcomes[i]]~close$T,conf.level=0.90)
-t_test_results[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[2],-output$conf.int[1])}
 
 for(i in 1:length(outcomes)){
 output=t.test(close[,outcomes[i]]~close$T,conf.level=0.90)
@@ -630,39 +621,31 @@ colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standa
                                  "Standardized Lower Bound")
 rownames(standardized_results)=outcomes
 
-t_test_results=standardized_results
-
-
 
 cd <- as.data.frame(matrix(NA,length(outcomes),6))
 conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes",
                 "Revisionist Disputes","High-Level Revisionist Disputes") 
 names(cd) <- c("mean","upper","lower","ord","measure")
-cd$mean <- t_test_results[,3]
-cd$lower <- t_test_results[,4]
-cd$upper <- t_test_results[,5]
+cd$mean <- standardized_results[,3]
+cd$lower <- standardized_results[,4]
+cd$upper <- standardized_results[,5]
 cd$ord <- c(length(outcomes):1)
 cd$measure <- factor(conditions, levels=conditions[order(cd$ord)])
+
+
 # make the graph
-library(ggplot2)
 
-
-f <- ggplot(cd, 
-            aes(x=mean,y=measure,color=measure))
-plot3 <- f+geom_vline(xintercept=0, linetype="longdash")+
-
-  geom_errorbarh(aes(xmax =  upper, 
-                     xmin = lower),
-                 size=1.5, height=0)+
-  geom_point(stat="identity",size=4,fill="white")+
-  xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + theme(legend.position="none",
-  axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),axis.title=element_text(size=12.5),
-  plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.25,1.25),
-  breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium",
-  "-0.2\nsmall","0","0.2\nsmall","0.5\nmedium","0.8\nlarge","1","1.2\nvery large")) +  geom_vline(xintercept=
-  c(-1.2,-0.8,-0.5,-0.2,0.2,0.5,0.8,1.2),linetype=rep("dashed",8),colour=c("turquoise4","turquoise3","turquoise2",
-  "turquoise1","turquoise1","turquoise2","turquoise3","turquoise4"))+scale_color_manual(name="",values=c("darkblue",
-  "dodgerblue3","dodgerblue4","dodgerblue","darkblue","dodgerblue3"))
+AggressionPlot2_Rev <- ggplot(cd, aes(x=mean,y=measure,color=measure))+geom_vline(xintercept=0, 
+linetype="longdash")+geom_errorbarh(aes(xmax =  upper, xmin = lower),size=1.5, height=0)+
+geom_point(stat="identity",size=4,fill="white")+xlab("Estimated Treatment Effect (Standardized)")+
+ylab("")  + theme(legend.position="none",axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),
+axis.title=element_text(size=12.5),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ 
+scale_x_continuous(limits=c(-1.25,1.25),breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),
+labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium","-0.2\nsmall","0","0.2\nsmall","0.5\nmedium",
+"0.8\nlarge","1","1.2\nvery large")) + geom_vline(xintercept=c(-1.2,-0.8,-0.5,-0.2,0.2,0.5,0.8,1.2),
+linetype=rep("dashed",8),colour=c("turquoise4","turquoise3","turquoise2","turquoise1","turquoise1","turquoise2",
+"turquoise3","turquoise4"))+scale_color_manual(name="",values=c("darkblue","dodgerblue3","dodgerblue4",
+                                                                "dodgerblue","darkblue","dodgerblue3"))
                      
 ggsave("AggressionPlotIncRev.pdf",width=4,height=2,scale = 1.6)
 
@@ -670,17 +653,29 @@ ggsave("AggressionPlotIncRev.pdf",width=4,height=2,scale = 1.6)
 
 
 
+# Now we can check what percentage of variation in high-level disputes initiated is
+# explained by incumbent parties winning vs. losing.
 
 summary(lm(AbsoluteChangeHighDisputesInitiated~T,close))
-% Approx 4% of variance explained
 
-bandwidth=rdbwselect(dems$AbsoluteChangeHighDisputesInitiated,dems$Z)[[3]][[1]]
+# Approx 4% of variance explained
 
-dems=dems[is.na(dems$AbsoluteChangeHighDisputesInitiated)==FALSE&abs(dems$Z)<0.23,]
+
+# We can now make the RD graph for incumbency
+
+bandwidth=rdbwselect(incumbency$AbsoluteChangeHighDisputesInitiated,incumbency$Z)[[3]][[1]]
+
+# The following piece of code prevents the RDPlot function from breaking by removing
+# cases that are far from the cut-point.
+
+incumbency=incumbency[is.na(incumbency$AbsoluteChangeHighDisputesInitiated)==FALSE&abs(incumbency$Z)<0.23,]
+
+
+# The following code produces the graph.
 
 pdf("IncumbentRDGraph.pdf",height=4,width=5)
 par(oma=c(0,0,0,1),mar=c(4,6,1,1))
-RDPlot(dems$Z,dems$AbsoluteChangeHighDisputesInitiated,Bandwidth=bandwidth,
+RDPlot(incumbency$Z,incumbency$AbsoluteChangeHighDisputesInitiated,Bandwidth=bandwidth,
        xlab="Win/Loss Margin for Candidate\nfrom Challenger Party",
        ylab="Absolute Change in High-Level\nDisputes Initiated per Year",
        Main="",Tick.Marks = seq(-.2,.2,by=0.1),Labels=c("-20%","-10%","0%","10%","20%"),
@@ -689,7 +684,7 @@ RDPlot(dems$Z,dems$AbsoluteChangeHighDisputesInitiated,Bandwidth=bandwidth,
 dev.off()
 
 
-
+# Now let's look at disputes in the first year of the new leaders term.
 
 t.test(FYDisputesInitiated~T,close)
 t.test(FYHighDisputesInitiated~T,close)
@@ -703,15 +698,11 @@ t.test(FYAllHighDisputes~T,close)
 t.test(FYAllDisputes>0~T,close)
 t.test(FYAllHighDisputes>0~T,close)
 
+# Now we can make the coefficient plot for disputes in the first year of the new leaders term.
+
 outcomes=c("FYDisputesInitiated","FYHighDisputesInitiated","FYAllDisputes","FYAllHighDisputes") 
 
-t_test_results=matrix(0,nrow=length(outcomes),ncol=3)
-
 standardized_results=matrix(0,nrow=length(outcomes),ncol=5)
-
-for(i in 1:length(outcomes)){
-output=t.test(close[,outcomes[i]]~close$T,conf.level=0.95)
-t_test_results[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[2],-output$conf.int[1])}
 
 for(i in 1:length(outcomes)){
 output=t.test(close[,outcomes[i]]~close$T,conf.level=0.95)
@@ -744,29 +735,25 @@ cd <- as.data.frame(matrix(NA,length(outcomes),6))
 conditions <- c("Disputes Initiated\nin First Year","High-Level Disputes Initiated\nin First Year",
                 "All Disputes\nin First Year","All High-Level Disputes\nin First Year") 
 names(cd) <- c("mean","upper","lower","ord","measure")
-cd$mean <- t_test_results[,3]
-cd$lower <- t_test_results[,4]
-cd$upper <- t_test_results[,5]
+cd$mean <- standardized_results[,3]
+cd$lower <- standardized_results[,4]
+cd$upper <- standardized_results[,5]
 cd$ord <- c(length(outcomes):1)
 cd$measure <- factor(conditions, levels=conditions[order(cd$ord)])
 
 
-f <- ggplot(cd, 
-            aes(x=mean,y=measure,color=measure))
-plot3 <- f+geom_vline(xintercept=0, linetype="longdash")+
-
-  geom_errorbarh(aes(xmax =  upper, 
-                     xmin = lower),
-                 size=1.5, height=0)+
-  geom_point(stat="identity",size=4,fill="white")+
-  xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + theme(legend.position="none",
-  axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),axis.title=element_text(size=12.5),
-  plot.title = element_text(lineheight=2.2,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.4,1.4),
-  breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium",
-  "-0.2\nsmall","0","0.2\nsmall","0.5\nmedium","0.8\nlarge","1","1.2\nvery large"))  +  
-  geom_vline(xintercept=c(-1.2,-0.8,-0.5,-0.2,0.2,0.5,0.8,1.2),linetype=rep("dashed",8),colour=c("turquoise4",
-  "turquoise3","turquoise2","turquoise1","turquoise1","turquoise2","turquoise3","turquoise4"))+
-  scale_color_manual(name="",values=c("darkblue","dodgerblue3","dodgerblue4","dodgerblue","darkblue","dodgerblue3")) 
+AggressionPlot3 <- ggplot(cd, aes(x=mean,y=measure,color=measure))+geom_vline(xintercept=0, 
+linetype="longdash") + geom_errorbarh(aes(xmax =  upper, xmin = lower),size=1.5, height=0)+
+geom_point(stat="identity",size=4,fill="white")+xlab("Estimated Treatment Effect (Standardized)")+
+ylab("") + theme(legend.position="none",axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),
+axis.title=element_text(size=12.5),plot.title = element_text(lineheight=2.2,size=rel(1.5),face="bold"))+ 
+scale_x_continuous(limits=c(-1.4,1.4),breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),
+labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium","-0.2\nsmall","0","0.2\nsmall","0.5\nmedium",
+"0.8\nlarge","1","1.2\nvery large")) + geom_vline(xintercept=c(-1.2,-0.8,-0.5,-0.2,0.2,0.5,0.8,1.2),
+linetype=rep("dashed",8),colour=c("turquoise4","turquoise3","turquoise2","turquoise1",
+                                  "turquoise1","turquoise2","turquoise3","turquoise4"))+
+scale_color_manual(name="",values=c("darkblue","dodgerblue3","dodgerblue4",
+                                      "dodgerblue","darkblue","dodgerblue3")) 
 
 ggsave("AggressionPlotInc2.pdf",width=4,height=2,scale = 1.6)
 
@@ -792,18 +779,13 @@ ggsave("AggressionPlotInc2.pdf",width=4,height=2,scale = 1.6)
 
 
 
-
+# We can now make the version of the graph with revisionist disputes included that is available in the
+# Online Appendix
 
 outcomes=c("FYDisputesInitiated","FYHighDisputesInitiated","FYAllDisputes","FYAllHighDisputes",
            "FYRevisionist","FYHighRevisionist")
 
-t_test_results=matrix(0,nrow=length(outcomes),ncol=3)
-
 standardized_results=matrix(0,nrow=length(outcomes),ncol=5)
-
-for(i in 1:length(outcomes)){
-output=t.test(close[,outcomes[i]]~close$T,conf.level=0.95)
-t_test_results[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[2],-output$conf.int[1])}
 
 for(i in 1:length(outcomes)){
 output=t.test(close[,outcomes[i]]~close$T,conf.level=0.95)
@@ -814,8 +796,6 @@ sd(close[,outcomes[i]]))}
 colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standardized Upper Bound", 
                                  "Standardized Lower Bound")
 rownames(standardized_results)=outcomes
-
-t_test_results=standardized_results
 
 theme_nolegend <- function (base_size = 9, base_family = "", height, width) 
 {
@@ -837,29 +817,25 @@ conditions <- c("Disputes Initiated\nin First Year","High-Level Disputes Initiat
                 "All Disputes\nin First Year","All High-Level Disputes\nin First Year","Revisionist\nDisputes",
                 "High-Level Revisionist\nDisputes") 
 names(cd) <- c("mean","upper","lower","ord","measure")
-cd$mean <- t_test_results[,3]
-cd$lower <- t_test_results[,4]
-cd$upper <- t_test_results[,5]
+cd$mean <- standardized_results[,3]
+cd$lower <- standardized_results[,4]
+cd$upper <- standardized_results[,5]
 cd$ord <- c(length(outcomes):1)
 cd$measure <- factor(conditions, levels=conditions[order(cd$ord)])
 
-f <- ggplot(cd, 
-            aes(x=mean,y=measure,color=measure))
-plot3 <- f+geom_vline(xintercept=0, linetype="longdash")+
-
-  geom_errorbarh(aes(xmax =  upper, 
-                     xmin = lower),
-                 size=1.5, height=0)+
-  geom_point(stat="identity",size=4,fill="white")+
-  xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + theme(legend.position="none",
-  axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),axis.title=element_text(size=12.5),
-  plot.title = element_text(lineheight=2.2,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.4,1.4),
-  breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium",
-  "-0.2\nsmall","0","0.2\nsmall","0.5\nmedium","0.8\nlarge","1","1.2\nvery large"))  +  
-  geom_vline(xintercept=c(-1.2,-0.8,-0.5,-0.2,0.2,0.5,0.8,1.2),linetype=rep("dashed",8),colour=c("turquoise4",
-  "turquoise3","turquoise2","turquoise1","turquoise1","turquoise2","turquoise3","turquoise4"))+
-  scale_color_manual(name="",
-                     values=c("darkblue","dodgerblue3","dodgerblue4","dodgerblue","darkblue","dodgerblue3")) 
+AggressionPlot3_Rev <- ggplot(cd, aes(x=mean,y=measure,color=measure))+geom_vline(xintercept=0, 
+linetype="longdash")+geom_errorbarh(aes(xmax =  upper, xmin = lower), size=1.5, height=0)+
+geom_point(stat="identity",size=4,fill="white")+xlab("Estimated Treatment Effect (Standardized)")+
+ylab("")  + theme(legend.position="none",axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),
+axis.title=element_text(size=12.5),plot.title = element_text(lineheight=2.2,size=rel(1.5),face="bold"))+ 
+scale_x_continuous(limits=c(-1.4,1.4),breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),
+labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium","-0.2\nsmall","0","0.2\nsmall",
+"0.5\nmedium","0.8\nlarge","1","1.2\nvery large")) + 
+geom_vline(xintercept=c(-1.2,-0.8,-0.5,-0.2,0.2,0.5,0.8,1.2),linetype=rep("dashed",8),
+colour=c("turquoise4","turquoise3","turquoise2","turquoise1",
+         "turquoise1","turquoise2","turquoise3","turquoise4"))+
+scale_color_manual(name="",values=c("darkblue","dodgerblue3","dodgerblue4",
+                                    "dodgerblue","darkblue","dodgerblue3")) 
 
 ggsave("AggressionPlotInc2Rev.pdf",width=4,height=2,scale = 1.6)
 
