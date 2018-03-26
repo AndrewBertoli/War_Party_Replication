@@ -372,7 +372,7 @@ t.test(HighDisputesInitiated~T,diff3[abs(diff3$Z)<=0.04,])
 # We can now turn to the incumbency analysis. First subset the data to cases where the incumbent party
 # was either winner or runner-up (but not both).
 
-incumbency=dems_base[(dems_base$WinnerPartyInc==1+dems_base$RunnerUpPartyInc)==1,]
+incumbency=dems_base[(dems_base$WinnerPartyInc+dems_base$RunnerUpPartyInc)==1,]
 
 # Now create a forcing variable that denotes how close the candidate from the challenger party 
 # was from winning the presidency.
