@@ -9,9 +9,11 @@ require(devtools)
 source_url("https://raw.githubusercontent.com/AndrewBertoli/Natural-Experiments/master/RDPlot.R")
 
 
-setwd("/Users/andrewbertoli/Dropbox/Electoral-RDs/2Empirics/Data")
+# Read the data from Github
 
 data=read.csv("Election_Data_Updated.csv")
+
+# Create the forcing variable (distance each case was from the cut-point)
 
 data$Z=(data$PresVotes - data$PresSecondVotes)/(data$PresVotes + data$PresSecondVotes)
 
