@@ -60,11 +60,6 @@ close=ideology[abs(ideology$Z)<=0.04,]
 
 
 
-
-
-
-
-
 # Make the balance plot for ideology
 
 covs=c("PreviousDisputesInitiated","PreviousHighDisputesInitiated","AllPreviousDisputes",
@@ -551,21 +546,6 @@ colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standa
 
 rownames(standardized_results)=outcomes
 
-theme_nolegend <- function (base_size = 9, base_family = "", height, width) 
-{
-  theme_grey(base_size = base_size, base_family = base_family) %+replace% 
-    theme(axis.text = element_text(size = rel(0.8)), 
-          legend.position="none", 
-          axis.ticks = element_line(colour = "black"), 
-          legend.key = element_rect(colour = "grey80"), 
-          panel.background = element_rect(fill = "white", colour = NA), 
-          panel.border = element_rect(fill = NA,colour = "grey50"), 
-          panel.grid.major = element_line(colour = "grey90", size = 0.2), 
-          panel.grid.minor = element_line(colour = "grey98", size = 0.5), 
-          strip.background = element_rect(fill = "grey80",  colour = "grey50"), 
-          strip.background = element_rect(fill = "grey80", colour = "grey50"))
-}
-
 cd <- as.data.frame(matrix(NA,length(outcomes),6))
 conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes") 
 names(cd) <- c("mean","upper","lower","ord","measure")
@@ -716,21 +696,6 @@ rownames(standardized_results)=outcomes
 
 t_test_results=standardized_results
 
-theme_nolegend <- function (base_size = 9, base_family = "", height, width) 
-{
-  theme_grey(base_size = base_size, base_family = base_family) %+replace% 
-    theme(axis.text = element_text(size = rel(0.8)), 
-          legend.position="none", 
-          axis.ticks = element_line(colour = "black"), 
-          legend.key = element_rect(colour = "grey80"), 
-          panel.background = element_rect(fill = "white", colour = NA), 
-          panel.border = element_rect(fill = NA,colour = "grey50"), 
-          panel.grid.major = element_line(colour = "grey90", size = 0.2), 
-          panel.grid.minor = element_line(colour = "grey98", size = 0.5), 
-          strip.background = element_rect(fill = "grey80",  colour = "grey50"), 
-          strip.background = element_rect(fill = "grey80", colour = "grey50"))
-}
-
 cd <- as.data.frame(matrix(NA,length(outcomes),6))
 conditions <- c("Disputes Initiated\nin First Year","High-Level Disputes Initiated\nin First Year",
                 "All Disputes\nin First Year","All High-Level Disputes\nin First Year") 
@@ -796,21 +761,6 @@ sd(close[,outcomes[i]]))}
 colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standardized Upper Bound", 
                                  "Standardized Lower Bound")
 rownames(standardized_results)=outcomes
-
-theme_nolegend <- function (base_size = 9, base_family = "", height, width) 
-{
-  theme_grey(base_size = base_size, base_family = base_family) %+replace% 
-    theme(axis.text = element_text(size = rel(0.8)), 
-          legend.position="none", 
-          axis.ticks = element_line(colour = "black"), 
-          legend.key = element_rect(colour = "grey80"), 
-          panel.background = element_rect(fill = "white", colour = NA), 
-          panel.border = element_rect(fill = NA,colour = "grey50"), 
-          panel.grid.major = element_line(colour = "grey90", size = 0.2), 
-          panel.grid.minor = element_line(colour = "grey98", size = 0.5), 
-          strip.background = element_rect(fill = "grey80",  colour = "grey50"), 
-          strip.background = element_rect(fill = "grey80", colour = "grey50"))
-}
 
 cd <- as.data.frame(matrix(NA,length(outcomes),6))
 conditions <- c("Disputes Initiated\nin First Year","High-Level Disputes Initiated\nin First Year",
