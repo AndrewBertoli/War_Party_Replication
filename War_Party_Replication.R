@@ -17,7 +17,7 @@ data=read.csv("https://raw.githubusercontent.com/AndrewBertoli/War_Party_Replica
 
 data$Z=(data$PresVotes - data$PresSecondVotes)/(data$PresVotes + data$PresSecondVotes)
 
-# Create a variable showing the ideologial differnce between the two candidates in each case. We only want to use
+# Create a variable showing the ideological difference between the two candidates in each case. We only want to use
 # the cases where the candidates were at least two points apart (on a five-point ideology scale)
 
 data$IdeologyDifference=data$LeaderIdeologyScore-data$RunnerUpIdeologyScore
@@ -27,12 +27,12 @@ data$IdeologyDifference=data$LeaderIdeologyScore-data$RunnerUpIdeologyScore
 dems_base=data[data$Democracy==1&is.na(data$Z)==FALSE&is.na(data$IdeologyDifference)==FALSE&
 is.na(data$DisputesInitiated)==FALSE,]
 
-# Drop all cases where the two candidates were less than two points away from each other on the idological scale.
+# Drop all cases where the two candidates were less than two points away from each other on the ideological scale.
 # Name the new dataset "ideology"
 
 ideology=dems_base[-which(abs(dems_base$IdeologyDifference)<2),]
 
-# Create a forcing varaible that denotes how far the right-wing candidate was from winning
+# Create a forcing variable that denotes how far the right-wing candidate was from winning
 
 ideology$Z=ideology$Z*(2*as.numeric(ideology$IdeologyDifference>0)-1)
 
@@ -40,8 +40,8 @@ ideology$Z=ideology$Z*(2*as.numeric(ideology$IdeologyDifference>0)-1)
 
 ideology$T=as.numeric(ideology$Z>0)
 
-# Create the forcing variable plot
 
+# Create the forcing variable plot
 
 ForcingDensity1 = ggplot()+ geom_histogram(aes(x=ideology$Z[ideology$Z<0]*50),fill="powderblue",
 binwidth=2, color="black",origin = -50.00001)+ geom_histogram(aes(x=ideology$Z[ideology$Z>0]*50),
@@ -53,8 +53,8 @@ labels=c("-20%","-15%","-10%","-5%","0%","5%","10%","15%","20%"))+ylim(0,20)
 
 ForcingDensity1
 
-# Subset to just the cases that were in th 48%-52% range.
-# Recall here that Z is the percent difference between the winner and runner up, so 52%-48%=4%
+# Subset to just the cases that were in the 48%-52% range.
+# Recall here that Z is the percent difference between the winner and runner up, so 52%-48%=4%.
 
 close=ideology[abs(ideology$Z)<=0.04,]
 
@@ -116,7 +116,7 @@ BalancePlot1
 
 # Create the external validity graph for ideology
 
-# Download the National Material Capabilties dataset from the Correlates of War database
+# Download the National Material Capabilities dataset from the Correlates of War database
 # http://www.correlatesofwar.org/data-sets/national-material-capabilities
 
 nmc=read.csv("NMC_v4_0(1).csv",stringsAsFactors=FALSE)
@@ -139,7 +139,7 @@ nmc$index=paste(nmc$stateabb,nmc$year,sep=" ")
 
 alldems=(merge(democracies,nmc,by=c("index","index")))
 
-# Remove all columns except the capabilities
+# Remove all columns except the capabilities.
 
 alldems=alldems[,c("upop","tpop","pec","milper","milex","irst")]
 
@@ -147,7 +147,7 @@ alldems=alldems[,c("upop","tpop","pec","milper","milex","irst")]
 
 for(i in 1:ncol(alldems)){alldems[,i]=log(alldems[,i]+1)}
 
-# Get the covariates for the cases from the ideology dataset that were close to the cut-point
+# Get the covariates for the cases from the ideology dataset that were close to the cut-point.
 
 sample2=close[,c("upop", "tpop", "pec", "milper",  "milex","irst")]
 
@@ -155,7 +155,7 @@ sample2=close[,c("upop", "tpop", "pec", "milper",  "milex","irst")]
 
 for(i in 1:ncol(sample2)){sample2[,i]=log(sample2[,i]+1)}
 
-# We now want to add NA's to the end of the covaraites in sample2 so that we can merge it with alldems in one dataframe
+# We now want to add NA's to the end of the covariates in sample2 so that we can merge it with alldems.
 
 fill=matrix(NA,nrow=nrow(alldems)-nrow(sample2),ncol=ncol(sample2))
 
@@ -167,7 +167,7 @@ colnames(sample2)=c("Urban Population", "Total Population", "Energy Consumption"
 
 sample2=rbind(sample2,fill)
 
-# Now sample2 has the same dimensions as alldems
+# Now sample2 has the same dimensions as alldems.
 
 # Now we can merge sample2 and alldems into a new dataframe called "caps"
 
@@ -186,11 +186,12 @@ colnames(caps)=c("Sample Urban Population","Population Urban Population", "Sampl
 
 caps=melt(caps)
 
-# Now we can give the appropiate column names to the melted version of caps
+# Now we can give the appropriate column names to the melted version of caps
 
 colnames(caps)[2:3]=c("Variable","Value")
 
-# We now want to change the levels of caps$Variable so that the covariates will appear in the correct order in our external validity graph
+# We now want to change the levels of caps$Variable so that the covariates will appear in the correct order 
+# in our external validity graph
 
 caps$Variable=factor(caps$Variable,levels=c("Sample Urban Population","Population Urban Population", 
                                             "Sample Total Population", "Population Total Population",
@@ -210,7 +211,7 @@ ExternalValidity1
 
 
 
-# We can now make the talbe for the ideology cases
+# We can now make the table for the ideology cases
 
 close[close$Z>0,c("Country","Year","DisputesInitiated","HighDisputesInitiated")][order(close[close$Z>0,]$Year),]
 
@@ -238,7 +239,7 @@ t.test(HighDisputesInitiated>0~T,costa_rica_dropped)
 
 # The final test here addresses the issue that the U.S. (2001) is an outlier.
 
-# We can now make the coefficent plot for ideology.
+# We can now make the coefficient plot for ideology.
 
 outcomes=c("DisputesInitiated","HighDisputesInitiated","AllDisputes","AllHighDisputes")
 
@@ -388,7 +389,7 @@ incumbency$T=as.numeric(incumbency$Z>0)
 
 
 
-# Distribution of the forcing varialbe
+# Distribution of the forcing variable
 
 ForcingDensity2 = ggplot() + geom_histogram(aes(x=incumbency$Z[incumbency$Z<0]*50),fill="powderblue", 
 binwidth=2, color="black",origin = -50.00001)+ geom_histogram(aes(x=incumbency$Z[incumbency$Z>0]*50),
@@ -446,7 +447,7 @@ plot_grid(BalancePlot1,BalancePlot2,ncol=2)
 ggsave("PlaceboPlotsWarParty.pdf",width=3.2,height=1.2,scale = 3)
 
 
-# External Validity (following the same approach in the ideology analysis)
+# External Validity (following the approach from the ideology analysis)
 
 close=incumbency[abs(incumbency$Z)<=0.04,]
 
@@ -519,7 +520,7 @@ incumbency$AbsoluteChangeHighRevisionistDisputes=with(incumbency,abs(HighRevisio
 
 close=incumbency[abs(incumbency$Z)<=0.04,]
 
-# We can now make the talbe for the incumbency cases
+# We can now make the table for the incumbency cases
 
 close[close$Z>0,c("Country","Year","AbsoluteChangeDisputesInitiated",
                   "AbsoluteChangeHighDisputesInitiated")][order(close[close$Z>0,]$Year),]
@@ -533,7 +534,7 @@ t.test(AbsoluteChangeDisputesInitiated~T,close,alternative="less")
 t.test(AbsoluteChangeHighDisputesInitiated~T,close,alternative="less")
 
 
-# We can now make the coefficent plot for ideology.
+# We can now make the coefficient plot for ideology.
 
 outcomes=c("AbsoluteChangeDisputesInitiated","AbsoluteChangeHighDisputesInitiated","AbsoluteChangeAllDisputes",
            "AbsoluteChangeAllHighDisputes") 
