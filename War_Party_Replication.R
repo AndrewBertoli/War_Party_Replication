@@ -27,25 +27,25 @@ data$IdeologyDifference=data$LeaderIdeologyScore-data$RunnerUpIdeologyScore
 dems_base=data[data$Democracy==1&is.na(data$Z)==FALSE&is.na(data$IdeologyDifference)==FALSE&
 is.na(data$DisputesInitiated)==FALSE,]
 
-# Drop all cases where the two candidates were less than two points away from each other on the idological scale
+# Drop all cases where the two candidates were less than two points away from each other on the idological scale.
+# Name the new dataset "ideology"
 
-dems=dems_base[-which(abs(dems_base$IdeologyDifference)<2),]
+ideology=dems_base[-which(abs(dems_base$IdeologyDifference)<2),]
 
 # Create a forcing varaible that denotes how far the right-wing candidate was from winning
 
-dems$Z=dems$Z*(2*as.numeric(dems$IdeologyDifference>0)-1)
+ideology$Z=ideology$Z*(2*as.numeric(ideology$IdeologyDifference>0)-1)
 
 # Create a treatment variable {0,1} that denotes whether the right-wing candidate won. 
 
-dems$T=as.numeric(dems$Z>0)
+ideology$T=as.numeric(ideology$Z>0)
 
-dems2=dems
+# Create the forcing variable plot
 
 pdf("ForcingDensityIdeo.pdf", height=4, width=5)
-m <- ggplot()
-m = m + geom_histogram(aes(x=dems2$Z[dems2$Z<0]*50),fill="powderblue",
+m <- ggplot()+ geom_histogram(aes(x=ideology$Z[ideology$Z<0]*50),fill="powderblue",
                    binwidth=2, color="black",
-                   origin = -50.00001)+ geom_histogram(aes(x=dems2$Z[dems2$Z>0]*50),fill="cornflowerblue",
+                   origin = -50.00001)+ geom_histogram(aes(x=ideology$Z[ideology$Z>0]*50),fill="cornflowerblue",
                    binwidth=2, color="black",
                    origin = 0.00001)+
   theme_bw()+theme(axis.title = element_text(size=13),plot.title=element_text(size=20,face="bold",hjust=0.46))+
@@ -57,7 +57,9 @@ m = m + geom_histogram(aes(x=dems2$Z[dems2$Z<0]*50),fill="powderblue",
 m
 dev.off()
 
-close=dems[abs(dems$Z)<=0.04,]
+# Subset to just the cases that were in th 48%-52% range
+
+close=ideology[abs(ideology$Z)<=0.04,]
 
 
 
@@ -75,9 +77,9 @@ covs=c("PreviousDisputesInitiated","PreviousHighDisputesInitiated","AllPreviousD
 est=matrix(NA,ncol=3,nrow=length(covs))
 
 for(i in 1:length(covs)){
-output=t.test(dems[abs(dems$Z)<=0.04,covs[i]]~as.numeric(dems[abs(dems$Z)<=0.04,]$Z>0))
+output=t.test(ideology[abs(ideology$Z)<=0.04,covs[i]]~as.numeric(ideology[abs(ideology$Z)<=0.04,]$Z>0))
 est[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[1],-output$conf.int[2])/
-  sd(dems[,covs[i]],na.rm=TRUE)}
+  sd(ideology[,covs[i]],na.rm=TRUE)}
 
 
 theme_nolegend <- function (base_size = 9, base_family = "", height, width) 
