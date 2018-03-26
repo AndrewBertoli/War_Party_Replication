@@ -48,7 +48,7 @@ binwidth=2, color="black",origin = -50.00001)+ geom_histogram(aes(x=ideology$Z[i
 fill="cornflowerblue",binwidth=2, color="black",origin = 0.00001)+theme_bw()+
 theme(axis.title = element_text(size=13),plot.title=element_text(size=20,face="bold",hjust=0.46))+
 geom_vline(xintercept=0, colour="black")+xlab("Win/Loss Margin for\nRight-Wing Candidate")+
-ylab("Density") + labs(title="Ideology")+scale_x_continuous(breaks=seq(-20, 20, 5),
+ylab("Count") + labs(title="Ideology")+scale_x_continuous(breaks=seq(-20, 20, 5),
 labels=c("-20%","-15%","-10%","-5%","0%","5%","10%","15%","20%"))+ylim(0,20)
 
 ForcingDensity1
@@ -395,7 +395,7 @@ binwidth=2, color="black",origin = -50.00001)+ geom_histogram(aes(x=incumbency$Z
 fill="cornflowerblue", binwidth=2, color="black",origin = 0.00001)+theme_bw()+
 theme(axis.title = element_text(size=13),plot.title=element_text(size=20,face="bold",hjust=0.5))+
 geom_vline(xintercept=0, colour="black")+ xlab("Win/Loss Margin for\nChallenger Party Candidate")+
-ylab("Density") + labs(title="Incumbency")+scale_x_continuous(breaks=seq(-20, 20, 5),
+ylab("Count") + labs(title="Incumbency")+scale_x_continuous(breaks=seq(-20, 20, 5),
 labels=c("-20%","-15%","-10%","-5%","0%","5%","10%","15%","20%"))+  ylim(0,20)
 
 # We can make a pdf with the two forcing density graphs side-by-side
