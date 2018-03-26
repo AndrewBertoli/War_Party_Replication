@@ -640,15 +640,6 @@ ggsave("AggressionPlotIncRev.pdf",width=4,height=2,scale = 1.6)
 
 
 
-
-# Now we can check what percentage of variation in high-level disputes initiated is
-# explained by incumbent parties winning vs. losing.
-
-summary(lm(AbsoluteChangeHighDisputesInitiated~T,close))
-
-# Approx 4% of variance explained
-
-
 # We can now make the RD graph for incumbency
 
 bandwidth=rdbwselect(incumbency$AbsoluteChangeHighDisputesInitiated,incumbency$Z)[[3]][[1]]
