@@ -489,8 +489,8 @@ caps$Variable=factor(caps$Variable,levels=c("Sample Urban Population","Populatio
                      ordered=TRUE)
 
 ExternalValidity2 = ggplot(caps, aes(Variable,Value)) + geom_boxplot(fill=rep(c("cornflowerblue","lightgrey"),6)) + 
-coord_flip() + ylab("ln(value)") + xlab("") + theme_bw() +theme(axis.title=element_text(size=16)) 
-+ ggtitle("Incumbency") +theme(plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))
+coord_flip() + ylab("ln(value)") + xlab("") + theme_bw() +theme(axis.title=element_text(size=16)) +
+ggtitle("Incumbency") +theme(plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))
 
 ExternalValidity2
 
