@@ -100,9 +100,8 @@ cd$lower <- as.numeric(est[,3])
 cd$upper <- as.numeric(est[,2])
 cd$ord <- c(length(covs):1)
 cd$measure <- factor(conditions, levels=conditions[order(cd$ord)])
-# make the graph
-library(ggplot2)
 
+# make the graph
 BalancePlot1=ggplot(cd, aes(x=mean,y=measure,color="dodgerblue2"))+geom_vline(xintercept=0, linetype="longdash")+
 geom_errorbarh(aes(xmax =  upper, xmin = lower), size=1.5, height=0,color="dodgerblue2")+
 geom_point(stat="identity",size=4,fill="white",color="dodgerblue2")+ xlab("Difference (Standardized)")+
