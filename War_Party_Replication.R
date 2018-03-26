@@ -155,14 +155,19 @@ alldems=(merge(democracies,nmc,by=c("index","index")))
 
 alldems=alldems[,c("upop","tpop","pec","milper","milex","irst")]
 
-# Convert all outcomes to log(x+1) to mitigate the outlier problem. We use the "+1" so that the 0's don't go to -infinity.
+# Convert all covariates to log(x+1) to mitigate the outlier problem. We use the "+1" so that the 0's don't go to -infinity.
 
 for(i in 1:ncol(alldems)){alldems[,i]=log(alldems[,i]+1)}
 
+# Get the covariates for the cases from the ideology dataset that were close to the cut-point
+
 sample2=close[,c("upop", "tpop", "pec", "milper",  "milex","irst")]
+
+# Again, convert all covariates to log(x+1) to mitigate the outlier problem.
 
 for(i in 1:ncol(sample2)){sample2[,i]=log(sample2[,i]+1)}
 
+# We now want to add NA's to the end of the covaraites in sample2 so that we can merge it with alldems in one dataframe
 
 fill=matrix(NA,nrow=nrow(alldems)-nrow(sample2),ncol=ncol(sample2))
 
@@ -174,11 +179,14 @@ colnames(sample2)=c("Urban Population", "Total Population", "Energy Consumption"
 
 sample2=rbind(sample2,fill)
 
-caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],sample2[,4],
-           alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
+# Now sample2 has the same dimensions as alldems
+
+# Now we can merge sample2 and alldems into a new dataframe called "caps"
 
 caps=cbind(sample2[,1],alldems[,1],sample2[,2],alldems[,2],sample2[,3],alldems[,3],sample2[,4],
            alldems[,4],sample2[,5],alldems[,5],sample2[,6],alldems[,6])
+
+# We can next give the appropriate column names to caps 
 
 colnames(caps)=c("Sample Urban Population","Population Urban Population", "Sample Total Population", 
                  "Population Total Population","Sample Energy Consumption", "Population Energy Consumption",
@@ -186,9 +194,15 @@ colnames(caps)=c("Sample Urban Population","Population Urban Population", "Sampl
                  "Population Military Expenditures","Sample Iron and Steel Production",
                  "Population Iron and Steel Production")
 
+# We next want to melt caps to make it easier to use for ggplot2
+
 caps=melt(caps)
 
+# Now we can give the appropiate column names to the melted version of caps
+
 colnames(caps)[2:3]=c("Variable","Value")
+
+# We now want to change the levels of caps$Variable so that the covariates will appear in the correct order in our external validity graph
 
 caps$Variable=factor(caps$Variable,levels=c("Sample Urban Population","Population Urban Population", 
                                             "Sample Total Population", "Population Total Population",
@@ -198,6 +212,8 @@ caps$Variable=factor(caps$Variable,levels=c("Sample Urban Population","Populatio
                                             "Sample Iron and Steel Production","Population Iron and Steel Production"),
                      ordered=TRUE)
 
+# Finally, we can make the external validity graph for ideology
+
 ExternalValidity1 = ggplot(caps, aes(Variable,Value)) + geom_boxplot(fill=rep(c("cornflowerblue","lightgrey"),6)) +
 coord_flip()+ylab("ln(value)")+xlab("")+theme_bw()+theme(axis.title=element_text(size=16))+ggtitle("Ideology") +
 theme(plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))
@@ -206,15 +222,25 @@ ExternalValidity1
 
 
 
+# We can now make the talbe for the ideology cases
+
 close=dems[abs(dems$Z)<=0.04,]
 
 close[close$Z>0,c("Country","Year","DisputesInitiated","HighDisputesInitiated")][order(close[close$Z>0,]$Year),]
 
 close[close$Z<0,c("Country","Year","DisputesInitiated","HighDisputesInitiated")][order(close[close$Z<0,]$Year),]
 
+
+# Next, we can look at the results from t-tests
+
 t.test(DisputesInitiated~T,close)
 
 t.test(HighDisputesInitiated~T,close)
+
+
+# We discuss in the paper that the case of Costa Rica is very questionable. It did not involve any military action. 
+# It was just a minor incident that started because two Costa Rican police officers chased some subjects across the 
+# border and were arrested by the Nicaraguan police. We can briefly check the results after this case is dropped.
 
 costa_rica_dropped=close
 costa_rica_dropped$HighDisputesInitiated[costa_rica_dropped$Country=="Costa Rica"]=0
@@ -223,15 +249,12 @@ costa_rica_dropped$DisputesInitiated[costa_rica_dropped$Country=="Costa Rica"]=0
 t.test(DisputesInitiated~T,costa_rica_dropped)
 t.test(HighDisputesInitiated~T,costa_rica_dropped)
 
+
+# We can now make the coefficent plot for ideology.
+
 outcomes=c("DisputesInitiated","HighDisputesInitiated","AllDisputes","AllHighDisputes")
 
-t_test_results=matrix(0,nrow=length(outcomes),ncol=3)
-
 standardized_results=matrix(0,nrow=length(outcomes),ncol=5)
-
-for(i in 1:length(outcomes)){
-output=t.test(close[,outcomes[i]]~close$T)
-t_test_results[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[1],-output$conf.int[2])}
 
 for(i in 1:length(outcomes)){
 output=t.test(close[,outcomes[i]]~close$T)
@@ -244,29 +267,20 @@ colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standa
                                  "Standardized Lower Bound")
 rownames(standardized_results)=outcomes
 
-t_test_results=standardized_results
-
 cd <- as.data.frame(matrix(NA,length(outcomes),6))
 conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes") 
 names(cd) <- c("mean","upper","lower","ord","measure")
-cd$mean <- t_test_results[,3]
-cd$lower <- t_test_results[,4]
-cd$upper <- t_test_results[,5]
+cd$mean <- standardized_results[,3]
+cd$lower <- standardized_results[,4]
+cd$upper <- standardized_results[,5]
 cd$ord <- c(length(outcomes):1)
 cd$measure <- factor(conditions, levels=conditions[order(cd$ord)])
+
 # make the graph
-library(ggplot2)
-
-f <- ggplot(cd, 
-            aes(x=mean,y=measure,color=measure))
-plot3 <- f+geom_vline(xintercept=0, linetype="longdash")+
-
-  geom_errorbarh(aes(xmax =  upper, 
-                     xmin = lower),
-                 size=1.5, height=0)+
-  geom_point(stat="identity",size=4,fill="white")+
-  xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + 
-theme(legend.position="none",axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),
+f = ggplot(cd, aes(x=mean,y=measure,color=measure))+geom_vline(xintercept=0, linetype="longdash")+
+geom_errorbarh(aes(xmax =  upper,  xmin = lower), size=1.5, height=0)+ geom_point(stat="identity",size=4,fill="white")+
+xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + theme(legend.position="none",
+axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),
 axis.title=element_text(size=12.5),plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ 
 scale_x_continuous(limits=c(-1.25,1.25),breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),
 labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium","-0.2\nsmall","0","0.2\nsmall","0.5\nmedium",
@@ -291,18 +305,13 @@ ggsave("AggressionPlotIdeo.pdf",width=4,height=2,scale = 1.6)
 
 
 
-
+# We can now make the version of the graph with revisionist disputes included that is available in the
+# Online Appendix
 
 outcomes=c("DisputesInitiated","HighDisputesInitiated","AllDisputes","AllHighDisputes",
            "RevisionistDisputes","HighRevisionistDisputes")
 
-t_test_results=matrix(0,nrow=length(outcomes),ncol=3)
-
 standardized_results=matrix(0,nrow=length(outcomes),ncol=5)
-
-for(i in 1:length(outcomes)){
-output=t.test(close[,outcomes[i]]~close$T,conf.level=0.90)
-t_test_results[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[2],-output$conf.int[1])}
 
 for(i in 1:length(outcomes)){
 output=t.test(close[,outcomes[i]]~close$T,conf.level=0.90)
@@ -315,64 +324,33 @@ colnames(standardized_results)=c("Estimate","SD","Standardized Estimate","Standa
                                  "Standardized Lower Bound")
 rownames(standardized_results)=outcomes
 
-t_test_results=standardized_results
-
-
-
 cd <- as.data.frame(matrix(NA,length(outcomes),6))
 conditions <- c("Disputes Initiated","High-Level Disputes Initiated","All Disputes","All High-Level Disputes",
                 "Revisionist Disputes","High-Level Revisionist Disputes") 
 names(cd) <- c("mean","upper","lower","ord","measure")
-cd$mean <- t_test_results[,3]
-cd$lower <- t_test_results[,4]
-cd$upper <- t_test_results[,5]
+cd$mean <- standardized_results[,3]
+cd$lower <- standardized_results[,4]
+cd$upper <- standardized_results[,5]
 cd$ord <- c(length(outcomes):1)
 cd$measure <- factor(conditions, levels=conditions[order(cd$ord)])
 
-library(ggplot2)
-
-
-f <- ggplot(cd, 
-            aes(x=mean,y=measure,color=measure))
-plot3 <- f+geom_vline(xintercept=0, linetype="longdash")+
-
-  geom_errorbarh(aes(xmax =  upper, xmin = lower), size=1.5, height=0)+geom_point(stat="identity",size=4,fill="white")+
-  xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + theme(legend.position="none",
-  axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),axis.title=element_text(size=12.5),
-  plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.25,1.25),
-  breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\nvery large","-1","-0.8\nlarge",
-  "-0.5\nmedium","-0.2\nsmall","0","0.2\nsmall","0.5\nmedium","0.8\nlarge","1","1.2\nvery large")) +  
-  geom_vline(xintercept=c(-1.2,-0.8,-0.5,-0.2,0.2,0.5,0.8,1.2),linetype=rep("dashed",8),colour=c("turquoise4",
-  "turquoise3","turquoise2","turquoise1","turquoise1","turquoise2","turquoise3","turquoise4"))+
-  scale_color_manual(name="",values=c("darkblue","dodgerblue3","dodgerblue4","dodgerblue","darkblue","dodgerblue3"))
-
+f <- ggplot(cd, aes(x=mean,y=measure,color=measure))+geom_vline(xintercept=0, linetype="longdash")+
+geom_errorbarh(aes(xmax =  upper, xmin = lower), size=1.5, height=0)+geom_point(stat="identity",size=4,fill="white")+
+xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + theme(legend.position="none",
+axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),axis.title=element_text(size=12.5),
+plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+ scale_x_continuous(limits=c(-1.25,1.25),
+breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\nvery large","-1","-0.8\nlarge",
+"-0.5\nmedium","-0.2\nsmall","0","0.2\nsmall","0.5\nmedium","0.8\nlarge","1","1.2\nvery large")) +  
+geom_vline(xintercept=c(-1.2,-0.8,-0.5,-0.2,0.2,0.5,0.8,1.2),linetype=rep("dashed",8),colour=c("turquoise4",
+"turquoise3","turquoise2","turquoise1","turquoise1","turquoise2","turquoise3","turquoise4"))+
+scale_color_manual(name="",values=c("darkblue","dodgerblue3","dodgerblue4","dodgerblue","darkblue","dodgerblue3"))
 
 ggsave("AggressionPlotIdeoRev.pdf",width=4,height=2,scale = 1.6)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-bandwidth=rdbwselect(dems$HighDisputesInitiated,dems$Z)[[3]][[1]]
-
-pdf("IdeologyRDGraph.pdf",width=5,height=5)
-RDPlot(dems$Z,dems$HighDisputesInitiated,Bandwidth=bandwidth,xlab="Win/Loss Margin for Right-Wing Candidate",
-ylab="High-Level Militarized Disputes Initiated per Year",Main="",Tick.Marks = seq(-.2,.2,by=0.05),
-Labels=c("-20%","-15%","-10%","-5%","0%","5%","10%","15%","20%"),ylim=c(-0.5,2.5),xlim=c(-0.2,0.2),
-NBoots=10000,Plot.Raw.Data=TRUE,Plot.Means=FALSE,Raw.Data.Colors=c("Blue","Red"))
-dev.off()
-
-
-t.test(HighDisputesInitiated-as.numeric(close$T==1)*1.2*sd(close$HighDisputesInitiated)~T,close)
+# Testing whether electing left-wing candidates leads to medium, large, or very large increases in
+# state aggression.
 
 t.test(HighDisputesInitiated+as.numeric(close$T==1)*1.2*sd(close$HighDisputesInitiated)~T,close)
 t.test(HighDisputesInitiated+as.numeric(close$T==1)*0.8*sd(close$HighDisputesInitiated)~T,close)
@@ -382,19 +360,21 @@ t.test(HighDisputesInitiated+as.numeric(close$T==1)*0.5*sd(close$HighDisputesIni
 
 # Adjusting the minimum ideology distance between parties
 
+# Any difference
 diff1=dems_base[-which(abs(dems_base$IdeologyDifference)<1),]
 diff1$Z=diff1$Z*(2*as.numeric(diff1$IdeologyDifference>0)-1)
 diff1$T=as.numeric(diff1$Z>0)
 t.test(DisputesInitiated~T,diff1[abs(diff1$Z)<=0.04,])
 t.test(HighDisputesInitiated~T,diff1[abs(diff1$Z)<=0.04,])
 
-
+# At least a two-point difference
 diff2=dems_base[-which(abs(dems_base$IdeologyDifference)<2),]
 diff2$Z=diff2$Z*(2*as.numeric(diff2$IdeologyDifference>0)-1)
 diff2$T=as.numeric(diff2$Z>0)
 t.test(DisputesInitiated~T,diff2[abs(diff2$Z)<=0.04,])
 t.test(HighDisputesInitiated~T,diff2[abs(diff2$Z)<=0.04,])
 
+# At least a three-point difference
 diff3=dems_base[-which(abs(dems_base$IdeologyDifference)<3),]
 diff3$Z=diff3$Z*(2*as.numeric(diff3$IdeologyDifference>0)-1)
 diff3$T=as.numeric(diff3$Z>0)
