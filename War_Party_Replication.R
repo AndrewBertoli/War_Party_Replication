@@ -11,22 +11,31 @@ source_url("https://raw.githubusercontent.com/AndrewBertoli/Natural-Experiments/
 
 # Read the data from Github
 
-data=read.csv("Election_Data_Updated.csv")
+data=read.csv("https://raw.githubusercontent.com/AndrewBertoli/War_Party_Replication/Data.csv",stringsAsFactors=FALSE)
 
 # Create the forcing variable (distance each case was from the cut-point)
 
 data$Z=(data$PresVotes - data$PresSecondVotes)/(data$PresVotes + data$PresSecondVotes)
 
-setwd("/Users/andrewbertoli/Dropbox/Electoral-RDs/1Drafts/WarParty")
+# Create a variable showing the ideologial differnce between the two candidates in each case. We only want to use
+# the cases where the candidates were at least two points apart (on a five-point ideology scale)
 
 data$IdeologyDifference=data$LeaderIdeologyScore-data$RunnerUpIdeologyScore
+
+# Only keep cases where the country was a democracy and where we have data on ideological difference and disputes initiated.
 
 dems_base=data[data$Democracy==1&is.na(data$Z)==FALSE&is.na(data$IdeologyDifference)==FALSE&
 is.na(data$DisputesInitiated)==FALSE,]
 
+# Drop all cases where the two candidates were less than two points away from each other on the idological scale
+
 dems=dems_base[-which(abs(dems_base$IdeologyDifference)<2),]
 
+# Create a forcing varaible that denotes how far the right-wing candidate was from winning
+
 dems$Z=dems$Z*(2*as.numeric(dems$IdeologyDifference>0)-1)
+
+# Create a treatment variable {0,1} that denotes whether the right-wing candidate won. 
 
 dems$T=as.numeric(dems$Z>0)
 
