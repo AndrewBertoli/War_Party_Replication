@@ -11,7 +11,7 @@ source_url("https://raw.githubusercontent.com/AndrewBertoli/Natural-Experiments/
 
 # Read the data from Github
 
-data=read.csv("https://raw.githubusercontent.com/AndrewBertoli/War_Party_Replication/Data.csv",stringsAsFactors=FALSE)
+data=read.csv("https://raw.githubusercontent.com/AndrewBertoli/War_Party_Replication/master/Data.csv",stringsAsFactors=FALSE)
 
 # Create the forcing variable (distance each case was from the cut-point)
 
@@ -68,7 +68,7 @@ close=ideology[abs(ideology$Z)<=0.04,]
 
 
 
-# BalancePlot
+# Make the balance plot for ideology
 
 covs=c("PreviousDisputesInitiated","PreviousHighDisputesInitiated","AllPreviousDisputes",
 "AllPreviousHighDisputes","PreviousRevisionistDisputes","PreviousHighRevisionistDisputes", 
