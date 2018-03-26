@@ -42,22 +42,19 @@ ideology$T=as.numeric(ideology$Z>0)
 
 # Create the forcing variable plot
 
-pdf("ForcingDensityIdeo.pdf", height=4, width=5)
-m <- ggplot()+ geom_histogram(aes(x=ideology$Z[ideology$Z<0]*50),fill="powderblue",
-                   binwidth=2, color="black",
-                   origin = -50.00001)+ geom_histogram(aes(x=ideology$Z[ideology$Z>0]*50),fill="cornflowerblue",
-                   binwidth=2, color="black",
-                   origin = 0.00001)+
-  theme_bw()+theme(axis.title = element_text(size=13),plot.title=element_text(size=20,face="bold",hjust=0.46))+
-  geom_vline(xintercept=0, colour="black")+
-  xlab("Win/Loss Margin for\nRight-Wing Candidate")+
-  ylab("Density") + labs(title="Ideology")+
-  scale_x_continuous(breaks=seq(-20, 20, 5),labels=c("-20%","-15%","-10%","-5%","0%","5%","10%","15%","20%"))+
-  ylim(0,20)
-m
-dev.off()
 
-# Subset to just the cases that were in th 48%-52% range
+ForcingDensity1 = ggplot()+ geom_histogram(aes(x=ideology$Z[ideology$Z<0]*50),fill="powderblue",
+binwidth=2, color="black",origin = -50.00001)+ geom_histogram(aes(x=ideology$Z[ideology$Z>0]*50),
+fill="cornflowerblue",binwidth=2, color="black",origin = 0.00001)+theme_bw()+
+theme(axis.title = element_text(size=13),plot.title=element_text(size=20,face="bold",hjust=0.46))+
+geom_vline(xintercept=0, colour="black")+xlab("Win/Loss Margin for\nRight-Wing Candidate")+
+ylab("Density") + labs(title="Ideology")+scale_x_continuous(breaks=seq(-20, 20, 5),
+labels=c("-20%","-15%","-10%","-5%","0%","5%","10%","15%","20%"))+ylim(0,20)
+
+ForcingDensity1
+
+# Subset to just the cases that were in th 48%-52% range.
+# Recall here that Z is the percent difference between the winner and runner up, so 52%-48%=4%
 
 close=ideology[abs(ideology$Z)<=0.04,]
 
@@ -111,17 +108,14 @@ cd$measure <- factor(conditions, levels=conditions[order(cd$ord)])
 # make the graph
 library(ggplot2)
 
-f <- ggplot(cd, 
-            aes(x=mean,y=measure,color="dodgerblue2"))
-balanceplot1 <- f+geom_vline(xintercept=0, linetype="longdash")+
-
+BalancePlot1=ggplot(cd, aes(x=mean,y=measure,color="dodgerblue2"))+geom_vline(xintercept=0, linetype="longdash")+
 geom_errorbarh(aes(xmax =  upper, xmin = lower), size=1.5, height=0,color="dodgerblue2")+
 geom_point(stat="identity",size=4,fill="white",color="dodgerblue2")+ xlab("Difference (Standardized)")+
 ylab("")+ labs(title="Ideology") +theme(legend.position="none",axis.text=element_text(size=10),
 axis.title=element_text(size=12),axis.title.x = element_text(hjust=1),
 plot.title = element_text(lineheight=1.8,size=rel(1.5),face="bold"))+xlim(-2,2)
 
-balanceplot1
+BalancePlot1
 
 
 
@@ -224,8 +218,6 @@ ExternalValidity1
 
 # We can now make the talbe for the ideology cases
 
-close=dems[abs(dems$Z)<=0.04,]
-
 close[close$Z>0,c("Country","Year","DisputesInitiated","HighDisputesInitiated")][order(close[close$Z>0,]$Year),]
 
 close[close$Z<0,c("Country","Year","DisputesInitiated","HighDisputesInitiated")][order(close[close$Z<0,]$Year),]
@@ -277,7 +269,7 @@ cd$ord <- c(length(outcomes):1)
 cd$measure <- factor(conditions, levels=conditions[order(cd$ord)])
 
 # make the graph
-f = ggplot(cd, aes(x=mean,y=measure,color=measure))+geom_vline(xintercept=0, linetype="longdash")+
+AggressionPlot1 = ggplot(cd, aes(x=mean,y=measure,color=measure))+geom_vline(xintercept=0, linetype="longdash")+
 geom_errorbarh(aes(xmax =  upper,  xmin = lower), size=1.5, height=0)+ geom_point(stat="identity",size=4,fill="white")+
 xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + theme(legend.position="none",
 axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),
@@ -290,15 +282,6 @@ linetype=rep("dashed",8),colour=c("turquoise4","turquoise3","turquoise2","turquo
 "darkblue","dodgerblue3")) 
 
 ggsave("AggressionPlotIdeo.pdf",width=4,height=2,scale = 1.6)
-
-
-
-
-
-
-
-
-
 
 
 
@@ -334,7 +317,7 @@ cd$upper <- standardized_results[,5]
 cd$ord <- c(length(outcomes):1)
 cd$measure <- factor(conditions, levels=conditions[order(cd$ord)])
 
-f <- ggplot(cd, aes(x=mean,y=measure,color=measure))+geom_vline(xintercept=0, linetype="longdash")+
+AggressionPlot1_Rev <- ggplot(cd, aes(x=mean,y=measure,color=measure))+geom_vline(xintercept=0, linetype="longdash")+
 geom_errorbarh(aes(xmax =  upper, xmin = lower), size=1.5, height=0)+geom_point(stat="identity",size=4,fill="white")+
 xlab("Estimated Treatment Effect (Standardized)")+ylab("")  + theme(legend.position="none",
 axis.text.x=element_text(size=7.7),axis.text.y=element_text(size=10.7),axis.title=element_text(size=12.5),
@@ -386,20 +369,42 @@ t.test(HighDisputesInitiated~T,diff3[abs(diff3$Z)<=0.04,])
 
 
 
+# We can now turn to the incumbency analysis. First subset the data to cases where the incumbent party
+# was either winner or runner-up (but not both).
+
+incumbency=dems_base[(dems_base$WinnerPartyInc==1+dems_base$RunnerUpPartyInc)==1,]
+
+# Now create a forcing variable that denotes how close the candidate from the challenger party 
+# was from winning the presidency.
+
+incumbency$Z=-incumbency$Z*(2*as.numeric(incumbency$WinnerPartyInc-incumbency$RunnerUpPartyInc>0)-1)
+
+# Create a treatment variable {0,1} that denotes whether the candidate from the challenger party won. 
+
+incumbency$T=as.numeric(incumbency$Z>0)
 
 
 
 
-# Incumbency
 
-dems=data[data$Democracy==1,]
-dems=dems[is.na(dems$Z)==FALSE&is.na(dems$DisputesInitiated)==FALSE,]
-dems=dems[dems$WinnerPartyInc==1|dems$RunnerUpPartyInc==1,]
-dems=dems[-which(dems$WinnerPartyInc==1&dems$RunnerUpPartyInc==1),]
 
-dems$Z=-dems$Z*(2*as.numeric(dems$WinnerPartyInc-dems$RunnerUpPartyInc>0)-1)
+# Distribution of the forcing varialbe
 
-dems$T=as.numeric(dems$Z>0)
+ForcingDensity2 = ggplot() + geom_histogram(aes(x=incumbency$Z[incumbency$Z<0]*50),fill="powderblue", 
+binwidth=2, color="black",origin = -50.00001)+ geom_histogram(aes(x=incumbency$Z[incumbency$Z>0]*50),
+fill="cornflowerblue", binwidth=2, color="black",origin = 0.00001)+theme_bw()+
+theme(axis.title = element_text(size=13),plot.title=element_text(size=20,face="bold",hjust=0.5))+
+geom_vline(xintercept=0, colour="black")+ xlab("Win/Loss Margin for\nChallenger Party Candidate")+
+ylab("Density") + labs(title="Incumbency")+scale_x_continuous(breaks=seq(-20, 20, 5),
+labels=c("-20%","-15%","-10%","-5%","0%","5%","10%","15%","20%"))+  ylim(0,20)
+
+# We can make a pdf with the two forcing density graphs side-by-side
+
+plot_grid(ForcingDensity1,ForcingDensity2,ncol=2)
+
+ggsave("ForcingDensity.pdf",width=2.4,height=1.1,scale = 3)
+
+
 
 # Balance Plot
 
@@ -409,8 +414,8 @@ covs=c("PreviousDisputesInitiated","PreviousHighDisputesInitiated","AllPreviousD
 est=matrix(NA,ncol=3,nrow=length(covs))
 
 for(i in 1:length(covs)){
-output=t.test(dems[abs(dems$Z)<=0.04,covs[i]]~as.numeric(dems[abs(dems$Z)<=0.04,]$Z>0))
-est[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[1],-output$conf.int[2])/sd(dems[,covs[i]],na.rm=TRUE)}
+output=t.test(incumbency[abs(incumbency$Z)<=0.04,covs[i]]~as.numeric(incumbency[abs(incumbency$Z)<=0.04,]$Z>0))
+est[i,]=c(output$estimate[2]-output$estimate[1],-output$conf.int[1],-output$conf.int[2])/sd(incumbency[,covs[i]],na.rm=TRUE)}
 
 cd <- as.data.frame(matrix(NA,length(covs),5))
 conditions <- c("Previous Disputes Initiated","Previous High-Level Disputes Initiated","All Previous Disputes",
@@ -424,35 +429,30 @@ cd$upper <- as.numeric(est[,2])
 cd$ord <- c(length(covs):1)
 cd$measure <- factor(conditions, levels=conditions[order(cd$ord)])
 
+BalancePlot2 <- ggplot(cd, aes(x=mean,y=measure,color=measure)) +geom_vline(xintercept=0, linetype="longdash")+
+geom_errorbarh(aes(xmax =  upper, xmin = lower),size=1.5, height=0,color="dodgerblue2")+
+geom_point(stat="identity",size=4,fill="white",color="dodgerblue2")+
+xlab("Difference (Standardized)")+ylab("")+ labs(title="Incumbency") +theme(legend.position="none",
+axis.text=element_text(size=10),axis.title=element_text(size=12),axis.title.x = element_text(hjust=1),
+plot.title = element_text(lineheight=3,size=rel(1.5),face="bold",hjust=-0.5))+xlim(-2,2)
+
+BalancePlot2
 
 
-f <- ggplot(cd, 
-            aes(x=mean,y=measure,color=measure))
-balanceplot2 <- f+geom_vline(xintercept=0, linetype="longdash")+
+# Make a pdf with both the balance plots side-by-side
 
-  geom_errorbarh(aes(xmax =  upper, 
-                     xmin = lower),
-                 size=1.5, height=0,color="dodgerblue2")+
-  geom_point(stat="identity",size=4,fill="white",color="dodgerblue2")+
-  xlab("Difference (Standardized)")+ylab("")+ labs(title="Incumbency") +theme(legend.position="none",
-  axis.text=element_text(size=10),axis.title=element_text(size=12),axis.title.x = element_text(hjust=1),
-  plot.title = element_text(lineheight=3,size=rel(1.5),face="bold",hjust=-0.5))+xlim(-2,2)
-
-balanceplot2
-
-plot_grid(balanceplot1,balanceplot2,ncol=2)
+plot_grid(BalancePlot1,BalancePlot2,ncol=2)
 
 ggsave("PlaceboPlotsWarParty.pdf",width=3.2,height=1.2,scale = 3)
 
 
-# ExternalValidity
+# External Validity (following the same approach in the ideology analysis)
 
-close=dems[abs(dems$Z)<=0.04,]
+close=incumbency[abs(incumbency$Z)<=0.04,]
 
 sample2=close[,c("upop", "tpop", "pec", "milper",  "milex","irst")]
 
 for(i in 1:ncol(sample2)){sample2[,i]=log(sample2[,i]+1)}
-
 
 fill=matrix(NA,nrow=nrow(alldems)-nrow(sample2),ncol=ncol(sample2))
 
@@ -494,47 +494,30 @@ coord_flip() + ylab("ln(value)") + xlab("") + theme_bw() +theme(axis.title=eleme
 
 ExternalValidity2
 
+# We can now create a pdf with the two external validity graphs side-by-side 
 
 plot_grid(ExternalValidity1,ExternalValidity2,ncol=2)
-
-setwd("/Users/andrewbertoli/Dropbox/Electoral-RDs/1Drafts/WarParty")
 
 ggsave("External_Validity.pdf",width=3.1,height=1.1,scale = 3)
 
 
 
 
+# Now we need to calculate the absolute change for the outcomes in our dataset
 
-
-dems$AbsoluteChangeDisputesInitiated=with(dems,abs(DisputesInitiated-PreviousTermDisputesInitiated))
-dems$AbsoluteChangeHighDisputesInitiated=with(dems,abs(HighDisputesInitiated-PreviousTermHighDisputesInitiated))
-dems$AbsoluteChangeAllDisputes=with(dems,abs(AllDisputes-AllPreviousTermDisputes))
-dems$AbsoluteChangeAllHighDisputes=with(dems,abs(AllHighDisputes-AllPreviousTermHighDisputes))
-dems$AbsoluteChangeRevisionistDisputes=with(dems,abs(RevisionistDisputes-PreviousTermRevisionistDisputes))
-dems$AbsoluteChangeHighRevisionistDisputes=with(dems,abs(HighRevisionistDisputes-PreviousTermHighRevisionistDisputes))
-
-pdf("ForcingDensityInc.pdf", height=4, width=5)
-m2 <- ggplot()
-m2 = m2 + geom_histogram(aes(x=dems$Z[dems$Z<0]*50),fill="powderblue",
-                   binwidth=2, color="black",
-                   origin = -50.00001)+ geom_histogram(aes(x=dems$Z[dems$Z>0]*50),fill="cornflowerblue",
-                   binwidth=2, color="black",
-                   origin = 0.00001)+
-  theme_bw()+theme(axis.title = element_text(size=13),plot.title=element_text(size=20,face="bold",hjust=0.5))+
-  geom_vline(xintercept=0, colour="black")+
-  xlab("Win/Loss Margin for\nChallenger Party Candidate")+
-  ylab("Density") + labs(title="Incumbency")+
-  scale_x_continuous(breaks=seq(-20, 20, 5),labels=c("-20%","-15%","-10%","-5%","0%","5%","10%","15%","20%"))+  ylim(0,20)
-m2  
-dev.off()
-
-plot_grid(m,m2,ncol=2)
-
-ggsave("ForcingDensity.pdf",width=2.4,height=1.1,scale = 3)
+incumbency$AbsoluteChangeDisputesInitiated=with(incumbency,abs(DisputesInitiated-PreviousTermDisputesInitiated))
+incumbency$AbsoluteChangeHighDisputesInitiated=with(incumbency,abs(HighDisputesInitiated-PreviousTermHighDisputesInitiated))
+incumbency$AbsoluteChangeAllDisputes=with(incumbency,abs(AllDisputes-AllPreviousTermDisputes))
+incumbency$AbsoluteChangeAllHighDisputes=with(incumbency,abs(AllHighDisputes-AllPreviousTermHighDisputes))
+incumbency$AbsoluteChangeRevisionistDisputes=with(incumbency,abs(RevisionistDisputes-PreviousTermRevisionistDisputes))
+incumbency$AbsoluteChangeHighRevisionistDisputes=with(incumbency,abs(HighRevisionistDisputes-PreviousTermHighRevisionistDisputes))
 
 
 
-close=dems[abs(dems$Z)<=0.04,]
+# We can now subset to the cases where incumbent parties were within 2% of the cut-point. 
+# Again, remember here that Z is the percent difference between the winner and runner up, so 52%-48%=4%
+
+close=incumbency[abs(incumbency$Z)<=0.04,]
 
 close[close$Z>0,c("Country","Year","AbsoluteChangeDisputesInitiated",
                   "AbsoluteChangeHighDisputesInitiated")][order(close[close$Z>0,]$Year),]
