@@ -277,6 +277,8 @@ linetype=rep("dashed",8),colour=c("turquoise4","turquoise3","turquoise2","turquo
 "turquoise2","turquoise3","turquoise4"))+scale_color_manual(name="",values=c("dodgerblue4","dodgerblue",
 "darkblue","dodgerblue3")) 
 
+AggressionPlot1
+
 ggsave("AggressionPlotIdeo.pdf",width=4,height=2,scale = 1.6)
 
 
@@ -323,6 +325,8 @@ breaks=c(-1.2,-1,-0.8,-0.5,-0.2,0,0.2,0.5,0.8,1,1.2),labels=c("-1.2\nvery large"
 geom_vline(xintercept=c(-1.2,-0.8,-0.5,-0.2,0.2,0.5,0.8,1.2),linetype=rep("dashed",8),colour=c("turquoise4",
 "turquoise3","turquoise2","turquoise1","turquoise1","turquoise2","turquoise3","turquoise4"))+
 scale_color_manual(name="",values=c("darkblue","dodgerblue3","dodgerblue4","dodgerblue","darkblue","dodgerblue3"))
+
+AggressionPlot1_Rev
 
 ggsave("AggressionPlotIdeoRev.pdf",width=4,height=2,scale = 1.6)
 
@@ -570,6 +574,7 @@ labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium","-0.2\nsmall","0",
            "turquoise3","turquoise4"))+
   scale_color_manual(name="", values=c("dodgerblue4","dodgerblue","darkblue","dodgerblue3"))
 
+AggressionPlot2
 
 ggsave("AggressionPlotInc.pdf",width=4,height=2,scale = 1.6)
 
@@ -627,7 +632,9 @@ labels=c("-1.2\nvery large","-1","-0.8\nlarge","-0.5\nmedium","-0.2\nsmall","0",
 linetype=rep("dashed",8),colour=c("turquoise4","turquoise3","turquoise2","turquoise1","turquoise1","turquoise2",
 "turquoise3","turquoise4"))+scale_color_manual(name="",values=c("darkblue","dodgerblue3","dodgerblue4",
                                                                 "dodgerblue","darkblue","dodgerblue3"))
-                     
+
+AggressionPlot2_Rev
+
 ggsave("AggressionPlotIncRev.pdf",width=4,height=2,scale = 1.6)
 
 
@@ -721,6 +728,8 @@ linetype=rep("dashed",8),colour=c("turquoise4","turquoise3","turquoise2","turquo
 scale_color_manual(name="",values=c("darkblue","dodgerblue3","dodgerblue4",
                                       "dodgerblue","darkblue","dodgerblue3")) 
 
+AggressionPlot3
+
 ggsave("AggressionPlotInc2.pdf",width=4,height=2,scale = 1.6)
 
 
@@ -787,6 +796,8 @@ colour=c("turquoise4","turquoise3","turquoise2","turquoise1",
          "turquoise1","turquoise2","turquoise3","turquoise4"))+
 scale_color_manual(name="",values=c("darkblue","dodgerblue3","dodgerblue4",
                                     "dodgerblue","darkblue","dodgerblue3")) 
+
+AggressionPlot3_Rev
 
 ggsave("AggressionPlotInc2Rev.pdf",width=4,height=2,scale = 1.6)
 
