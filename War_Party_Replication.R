@@ -126,24 +126,36 @@ balanceplot1
 
 
 
-# External Validity
+# Create the external validity graph for ideology
 
-setwd("/Users/andrewbertoli/Dropbox/United Government/BuildData")
+# Download the National Material Capabilties dataset from the Correlates of War database
+# http://www.correlatesofwar.org/data-sets/national-material-capabilities
+
 nmc=read.csv("NMC_v4_0(1).csv",stringsAsFactors=FALSE)
 
-setwd("/Users/andrewbertoli/Dropbox/United Government/ReplicationCode")
+# Download the Polity IV dataset
+# http://www.systemicpeace.org/inscrdata.html
+
 polity=read.csv("Polity.csv",stringsAsFactors=FALSE)
 
-setwd("/Users/andrewbertoli/Dropbox/Electoral-RDs/1Drafts/WarParty")
+# Subset to just the democracies in the Polity IV dataset
 
 democracies=polity[polity$polity>=6,]
+
+# Create an index to match the country-years in democracies to country-years in nmc.
 
 democracies$index=paste(democracies$scode,democracies$year,sep=" ")
 nmc$index=paste(nmc$stateabb,nmc$year,sep=" ")
 
+# Merge the two datasets
+
 alldems=(merge(democracies,nmc,by=c("index","index")))
 
+# Remove all columns except the capabilities
+
 alldems=alldems[,c("upop","tpop","pec","milper","milex","irst")]
+
+# Convert all outcomes to log(x+1) to mitigate the outlier problem. We use the "+1" so that the 0's don't go to -infinity.
 
 for(i in 1:ncol(alldems)){alldems[,i]=log(alldems[,i]+1)}
 
