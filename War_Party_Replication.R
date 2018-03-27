@@ -11,7 +11,8 @@ source_url("https://raw.githubusercontent.com/AndrewBertoli/Natural-Experiments/
 
 # Read the data from Github
 
-data=read.csv("https://raw.githubusercontent.com/AndrewBertoli/War_Party_Replication/master/WarPartyData.csv",stringsAsFactors=FALSE)
+data=read.csv("https://raw.githubusercontent.com/AndrewBertoli/War_Party_Replication/master/WarPartyData.csv",
+              stringsAsFactors=FALSE)
 
 # Create the forcing variable (distance each case was from the cut-point)
 
@@ -25,7 +26,7 @@ data$IdeologyDifference=data$LeaderIdeologyScore-data$RunnerUpIdeologyScore
 # Only keep cases where the country was a democracy and where we have data on ideological difference and disputes initiated.
 
 dems_base=data[data$Democracy==1&is.na(data$Z)==FALSE&is.na(data$IdeologyDifference)==FALSE&
-is.na(data$DisputesInitiated)==FALSE,]
+               is.na(data$DisputesInitiated)==FALSE,]
 
 # Drop all cases where the two candidates were less than two points away from each other on the ideological scale.
 # Name the new dataset "ideology"
